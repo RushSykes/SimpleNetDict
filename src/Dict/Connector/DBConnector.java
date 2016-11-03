@@ -4,5 +4,5 @@ package Dict.Connector;
  * This is the connector class used for C/S mode
  * Connecting to database
  */
-class DBConnector {
+public class DBConnector {
 }
