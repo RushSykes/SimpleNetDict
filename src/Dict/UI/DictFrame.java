@@ -16,27 +16,34 @@ import javafx.geometry.*;
  */
 
 public class DictFrame extends Application {
-    // Top-level scene and pane
-    Scene primaryScene;
-    StackPane rootPane;
+    // Top-level scene
+    Scene welcomeScene;
+    Scene signUpScene;
 
-    // Widgets of welcomePane
+    // Widgets of welcomeScene
     GridPane welcomePane;
     Text welcomeTitle;
     Label userName, password;
     TextField userTextField;
     PasswordField passwordField;
-    HBox buttonHBox;
+    HBox welcomeButtonHBox;
     Button logInButton, signUpButton;
     final Text userNotExist = new Text();
-    // Widgets of dictPane
-    // To be added...
+
+    // Widgets of signUpScene
+    GridPane signUpPane;
+    Text signUpTitle;
+    Label newUser, newPassword, newConfirm;
+    TextField newUserTextField;
+    PasswordField newPasswordField, confirmField;
+    HBox regButtonHBox;
+    Button registerButton, backButton;
+    final Text regInfo = new Text();
 
     @Override
     public void start(Stage primaryStage) {
         /* Set properties of the window */
         primaryStage.setTitle("NeT Dictionary");
-        primaryStage.show();
 
         /* Set up welcome Interface */
         // welcomePane
@@ -66,7 +73,7 @@ public class DictFrame extends Application {
         welcomePane.add(userNotExist, 1, 6);
 
         // Buttons
-        buttonHBox = new HBox(10);
+        welcomeButtonHBox = new HBox(10);
         signUpButton = new Button("Sign Up");
         logInButton = new Button("Log In");
         logInButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -78,21 +85,90 @@ public class DictFrame extends Application {
                 userNotExist.setText("User doesn't exist");
             }
         });
+        signUpButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // First clear all the textfield
+                userTextField.clear();
+                passwordField.clear();
+                userNotExist.setText("");
+                // Switch to the signUpScene
+                // SignUpPane
+                signUpPane = new GridPane();
+                signUpPane.setAlignment(Pos.CENTER);
+                signUpPane.setHgap(10);
+                signUpPane.setVgap(10);
+                signUpPane.setPadding(new Insets(25, 25, 25, 25));
 
-        buttonHBox.setAlignment(Pos.BOTTOM_RIGHT);
-        buttonHBox.getChildren().addAll(signUpButton, logInButton);
-        welcomePane.add(buttonHBox, 1, 4);
+                // signUpTitle
+                signUpTitle = new Text("Sign Up\nHere");
+                signUpTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+                signUpPane.add(signUpTitle, 0, 0, 2, 1);
 
-        /* Set up the rootPane (rootPane is used for switching between interfaces) */
-        rootPane = new StackPane();
-        rootPane.getChildren().addAll(welcomePane);
+                /*
+                    Label newUser, newPassword, newConfirm;
+                    TextField newUserTextField;
+                    PasswordField newPasswordField, confirmField;
+                    HBox regButtonHBox;
+                    Button registerButton, backButton;
+                    final Text regInfo = new Text();
+                 */
+                // New User name and password
+                newUser = new Label("New user Name:");
+                signUpPane.add(newUser, 0, 1);
 
-        // Add the rootPane to the primaryScene
-        // so that the primary scene in fact has all the panes
-        primaryScene = new Scene(rootPane, 480, 640);
+                newUserTextField = new TextField();
+                signUpPane.add(newUserTextField, 1, 1);
+
+                newPassword = new Label("Password:");
+                signUpPane.add(newPassword, 0, 2);
+
+                newPasswordField = new PasswordField();
+                signUpPane.add(newPasswordField, 1, 2);
+
+                newConfirm = new Label("Confirm password:");
+                signUpPane.add(newConfirm, 0, 3);
+
+                confirmField = new PasswordField();
+                signUpPane.add(confirmField, 1, 3);
+
+                regButtonHBox = new HBox(10);
+                backButton = new Button("Back");
+                registerButton = new Button("Register!");
+
+                // WHen click back, go back to welcome scene
+                backButton.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        // First clear all teh fields
+                        newUserTextField.clear();
+                        newPasswordField.clear();
+                        confirmField.clear();
+                        primaryStage.setScene(welcomeScene);
+                    }
+                });
+
+                regButtonHBox.setAlignment(Pos.BOTTOM_RIGHT);
+                regButtonHBox.getChildren().addAll(backButton, registerButton);
+                signUpPane.add(regButtonHBox, 1, 5);
+
+                signUpScene = new Scene(signUpPane, 480, 640);
+
+                // Assign it to the stage, whilst cancel teh assignment of welcome scene
+                primaryStage.setScene(signUpScene);
+
+            }
+        });
+
+        welcomeButtonHBox.setAlignment(Pos.BOTTOM_RIGHT);
+        welcomeButtonHBox.getChildren().addAll(signUpButton, logInButton);
+        welcomePane.add(welcomeButtonHBox, 1, 4);
+
+        welcomeScene = new Scene(welcomePane, 480, 640);
 
         // Assign the scene to the stage
-        primaryStage.setScene(primaryScene);
+        primaryStage.setScene(welcomeScene);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
