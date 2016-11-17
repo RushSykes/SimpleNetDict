@@ -157,6 +157,8 @@ public class DictFrame extends Application {
                     int flag = connector.findUser_Login(userTextField.getText(), passwordField.getText());
                     switch(flag) {
                         case 0:
+                            userNotExist.setFill(Color.FORESTGREEN);
+                            userNotExist.setText("Logged in");
                             break;
                         case 1:
                             userNotExist.setFill(Color.FIREBRICK);

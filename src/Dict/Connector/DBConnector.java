@@ -20,7 +20,7 @@ public class DBConnector {
         DB_Driver = "com.mysql.jdbc.Driver";
         DB_Url = "jdbc:mysql://localhost:3306/dictdatabase";
         DB_User = "Rush";
-        DB_Password = "supersonic123";
+        DB_Password = "test1234";
         DB_Conn = null;
         connDone = false;
     }
