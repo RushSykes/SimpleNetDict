@@ -127,6 +127,7 @@ public class DictFrame extends Application {
 
         confirmField = new PasswordField();
         signUpPane.add(confirmField, 1, 3);
+        signUpPane.add(regInfo, 1, 7);
 
         regButtonHBox = new HBox(10);
         backButton = new Button("Back");
@@ -193,6 +194,26 @@ public class DictFrame extends Application {
             public void handle(ActionEvent event) {
                 // Should look up the username in the database first
                 // To be added...
+
+                // If connection is valid
+                if (connector.getConnStat()) {
+                    int flag = connector.findUser_Register(newUserTextField.getText(), newPasswordField.getText(), confirmField.getText());
+                    switch (flag) {
+                        case 0:
+                            regInfo.setFill(Color.FORESTGREEN);
+                            regInfo.setText("Register successful");
+                            break;
+                        case 1:
+                            regInfo.setFill(Color.FIREBRICK);
+                            regInfo.setText("Password mismatching");
+                            break;
+                        case 2:
+                            regInfo.setFill(Color.FIREBRICK);
+                            regInfo.setText("User exists");
+                            break;
+                        default:
+                    }
+                }
             }
         });
 

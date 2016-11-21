@@ -18,7 +18,7 @@ public class DBConnector {
     // Constructor
     public DBConnector() {
         DB_Driver = "com.mysql.jdbc.Driver";
-        DB_Url = "jdbc:mysql://localhost:3306/dictdatabase";
+        DB_Url = "jdbc:mysql://172.26.7.66:3306/dictdatabase";
         DB_User = "Rush";
         DB_Password = "test1234";
         DB_Conn = null;
@@ -80,13 +80,47 @@ public class DBConnector {
             }
             catch(SQLException ex) {
                 // Handle any errors
-                System.out.println("Find user");
+                System.out.println("Find user in login");
                 System.out.println("SQLException: " + ex.getMessage());
                 System.out.println("SQLState: " + ex.getSQLState());
                 System.out.println("VendorError: " + ex.getErrorCode());
                 return -1;
             }
         } // Connection established
+        System.out.println("Connection not established");
+        return -1;
+    }
+
+    // =========================================
+    // Deal with user data in db
+    // Return :
+    // -1 for exception
+    // 0 for success
+    // 1 for password mismatching
+    // 2 for user exists
+    public int findUser_Register(String userName, String password, String confirm) {
+        if (connDone) {
+            try {
+                Statement stmt = DB_Conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE userName =\'" + userName + "\'");
+                while (!rs.next()) {
+                    if (password.equals(confirm)) {
+                        stmt.executeUpdate("INSERT INTO users (userName, password) VALUES (\'" + userName + "\', \'" + password + "\')");
+                        return 0;
+                    }
+                    else
+                        return 1;
+                }
+                return 2;
+            }
+            catch (SQLException ex) {
+                System.out.println("Find user in register");
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+                return -1;
+            }
+        }
         System.out.println("Connection not established");
         return -1;
     }
