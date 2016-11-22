@@ -1,6 +1,6 @@
-package Dict.UI;
+package Dict.Client;
 
-import Dict.Connector.DBConnector;
+import Dict.Server.DBConnector;
 import javafx.application.Application;
 import javafx.event.*;
 import javafx.scene.*;
@@ -18,31 +18,31 @@ import javafx.geometry.*;
 
 public class DictFrame extends Application {
     // Top-level scene
-    Scene welcomeScene;
-    Scene signUpScene;
+    private Scene welcomeScene;
+    private Scene signUpScene;
 
     // Widgets of welcomeScene
-    GridPane welcomePane;
-    Text welcomeTitle;
-    Label userName, password;
-    TextField userTextField;
-    PasswordField passwordField;
-    HBox welcomeButtonHBox;
-    Button logInButton, signUpButton;
-    final Text userNotExist = new Text();
+    private GridPane welcomePane;
+    private Text welcomeTitle;
+    private Label userName, password;
+    private TextField userTextField;
+    private PasswordField passwordField;
+    private HBox welcomeButtonHBox;
+    private Button logInButton, signUpButton;
+    final private Text userNotExist = new Text();
 
     // Widgets of signUpScene
-    GridPane signUpPane;
-    Text signUpTitle;
-    Label newUser, newPassword, newConfirm;
-    TextField newUserTextField;
-    PasswordField newPasswordField, confirmField;
-    HBox regButtonHBox;
-    Button registerButton, backButton;
-    final Text regInfo = new Text();
+    private GridPane signUpPane;
+    private Text signUpTitle;
+    private Label newUser, newPassword, newConfirm;
+    private TextField newUserTextField;
+    private PasswordField newPasswordField, confirmField;
+    private HBox regButtonHBox;
+    private Button registerButton, backButton;
+    final private Text regInfo = new Text();
 
-    // Connector
-    DBConnector connector = new DBConnector();
+    // One client, one dict frame
+    private MainClient client = new MainClient();
 
     @Override
     public void start(Stage primaryStage) {
@@ -140,10 +140,6 @@ public class DictFrame extends Application {
         signUpScene = new Scene(signUpPane, 480, 640);
 
         // =============================================================
-        // Connector
-        connector.connect();
-
-        // =============================================================
         // Listener and handlers
 
         // When click login, perform signIn process
@@ -151,26 +147,25 @@ public class DictFrame extends Application {
             @Override
             public void handle(ActionEvent event) {
                 // Should look up the username in the database first
-                // To be added...
 
-                // If connection is valid
-                if(connector.getConnStat()) {
-                    int flag = connector.findUser_Login(userTextField.getText(), passwordField.getText());
-                    switch(flag) {
-                        case 0:
-                            userNotExist.setFill(Color.FORESTGREEN);
-                            userNotExist.setText("Logged in");
-                            break;
-                        case 1:
-                            userNotExist.setFill(Color.FIREBRICK);
-                            userNotExist.setText("Wrong password");
-                            break;
-                        case 2:
-                            userNotExist.setFill(Color.FIREBRICK);
-                            userNotExist.setText("User doesn't exist");
-                            break;
-                        default:
-                    }
+                int flag = client.logIn(newUserTextField.getText(), newPasswordField.getText());
+
+                switch (flag) {
+                    case 0:
+                        userNotExist.setFill(Color.FORESTGREEN);
+                        userNotExist.setText("Logged in");
+                        break;
+                    case 1:
+                        userNotExist.setFill(Color.FIREBRICK);
+                        userNotExist.setText("Wrong password");
+                        break;
+                    case 2:
+                        userNotExist.setFill(Color.FIREBRICK);
+                        userNotExist.setText("User doesn't exist");
+                        break;
+                    default:
+                        userNotExist.setFill(Color.FIREBRICK);
+                        userNotExist.setText("An error occurred");
                 }
             }
         });
@@ -194,25 +189,27 @@ public class DictFrame extends Application {
             public void handle(ActionEvent event) {
                 // Should look up the username in the database first
                 // To be added...
-
-                // If connection is valid
-                if (connector.getConnStat()) {
-                    int flag = connector.findUser_Register(newUserTextField.getText(), newPasswordField.getText(), confirmField.getText());
-                    switch (flag) {
-                        case 0:
-                            regInfo.setFill(Color.FORESTGREEN);
-                            regInfo.setText("Register successful");
-                            break;
-                        case 1:
-                            regInfo.setFill(Color.FIREBRICK);
-                            regInfo.setText("Password mismatching");
-                            break;
-                        case 2:
-                            regInfo.setFill(Color.FIREBRICK);
-                            regInfo.setText("User exists");
-                            break;
-                        default:
-                    }
+                int flag = client.signUp(newUserTextField.getText(), newPasswordField.getText(), confirmField.getText());
+                // -1 for exception
+                // 0 for success
+                // 1 for password mismatching
+                // 2 for user exists
+                switch (flag) {
+                    case 0:
+                        regInfo.setFill(Color.FORESTGREEN);
+                        regInfo.setText("Register successful");
+                        break;
+                    case 1:
+                        regInfo.setFill(Color.FIREBRICK);
+                        regInfo.setText("Password mismatching");
+                        break;
+                    case 2:
+                        regInfo.setFill(Color.FIREBRICK);
+                        regInfo.setText("User exists");
+                        break;
+                    default:
+                        regInfo.setFill(Color.FIREBRICK);
+                        regInfo.setText("An error occurred");
                 }
             }
         });

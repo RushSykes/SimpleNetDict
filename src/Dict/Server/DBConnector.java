@@ -1,4 +1,4 @@
-package Dict.Connector;
+package Dict.Server;
 
 import java.sql.*;
 
@@ -57,7 +57,7 @@ public class DBConnector {
     }
 
     // =========================================
-    // Deal with user data in db
+    // Deal with user data in db, login
     // Return :
     // -1 for exception
     // 0 for success
@@ -87,12 +87,12 @@ public class DBConnector {
                 return -1;
             }
         } // Connection established
-        System.out.println("Connection not established");
+        System.out.println("Connection with database not established");
         return -1;
     }
 
     // =========================================
-    // Deal with user data in db
+    // Deal with user data in db, register
     // Return :
     // -1 for exception
     // 0 for success
@@ -121,7 +121,7 @@ public class DBConnector {
                 return -1;
             }
         }
-        System.out.println("Connection not established");
+        System.out.println("Connection with database not established");
         return -1;
     }
 }
