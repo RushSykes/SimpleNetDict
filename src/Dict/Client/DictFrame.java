@@ -1,6 +1,5 @@
 package Dict.Client;
 
-import Dict.Server.DBConnector;
 import javafx.application.Application;
 import javafx.event.*;
 import javafx.scene.*;
@@ -214,7 +213,7 @@ public class DictFrame extends Application {
             }
         });
 
-        // When click signUp, switch to another scene and prompt for more info
+        // When click signUp, switch to signUp scene and prompt for more info
         signUpButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {

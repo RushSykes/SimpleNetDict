@@ -20,12 +20,11 @@ public class MainServer {
     public MainServer() {
         try {
             ServerSocket serverSocket = new ServerSocket(8000);
-            // identify each client with anumber
+            // identify each client with a number
             int clientNo = 1;
 
             while(true) {
-                // Stub, listening for a new client
-                // TODO: create a set of 1 thread and 1 socket for every single new client
+                // create a set of 1 thread and 1 socket for every single new client
                 Socket socket = serverSocket.accept();
                 HandleClient newClient = new HandleClient(socket);
 
@@ -53,8 +52,7 @@ public class MainServer {
 
         // Run a thread that has just been created
         public void run() {
-            // Stub
-            // TODO: handle client info and respond
+            // Handle client info and respond
             try {
                 // Info that comes from the client
                 infoFromClient = new ObjectInputStream(socket.getInputStream());
