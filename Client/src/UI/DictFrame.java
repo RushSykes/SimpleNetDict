@@ -1,5 +1,6 @@
-package Dict.Client;
+package UI;
 
+import Client.MainClient;
 import javafx.application.Application;
 import javafx.event.*;
 import javafx.scene.*;

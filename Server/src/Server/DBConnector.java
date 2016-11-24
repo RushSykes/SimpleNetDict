@@ -1,4 +1,4 @@
-package Dict.Server;
+package Server;
 
 import java.sql.*;
 

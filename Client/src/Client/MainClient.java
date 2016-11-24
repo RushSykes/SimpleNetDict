@@ -1,6 +1,6 @@
-package Dict.Client;
+package Client;
 
-import Dict.ADT.UserInfo;
+import ADT.UserInfo;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

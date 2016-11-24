@@ -1,4 +1,4 @@
-package Dict.ADT;
+package ADT;
 
 import java.io.Serializable;
 

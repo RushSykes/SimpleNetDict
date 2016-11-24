@@ -1,6 +1,6 @@
-package Dict.Server;
+package Server;
 
-import Dict.ADT.UserInfo;
+import ADT.UserInfo;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
