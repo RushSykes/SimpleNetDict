@@ -28,7 +28,7 @@ public class MainClient {
             infoToServer= new ObjectOutputStream(socket.getOutputStream());
         }
         catch (IOException ex) {
-            System.err.println("Client:" + ex);
+            System.err.println("Client: " + ex);
         }
     }
 
@@ -45,9 +45,10 @@ public class MainClient {
             infoToServer.flush(); // Immediately send it out
 
             flag = infoFromServer.readInt(); // 0 1 2, or exception -1
+            System.out.println("LogIn stat: " + flag);
         }
         catch(IOException ex) {
-            System.err.println("Client:" + ex);
+            System.err.println("Client: " + ex);
             flag = -1;
         }
         return flag;
@@ -68,6 +69,7 @@ public class MainClient {
             infoToServer.flush(); // Immediately send it out
 
             flag = infoFromServer.readInt(); // 0 1 2, or exception -1
+            System.out.println("Register stat: " + flag);
         }
         catch(IOException ex) {
             System.err.println("Client:" + ex);

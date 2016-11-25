@@ -148,7 +148,7 @@ public class DictFrame extends Application {
             public void handle(ActionEvent event) {
                 // Should look up the username in the database first
 
-                int flag = client.logIn(newUserTextField.getText(), newPasswordField.getText());
+                int flag = client.logIn(userTextField.getText(), passwordField.getText());
 
                 switch (flag) {
                     case 0:

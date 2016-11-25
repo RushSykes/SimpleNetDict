@@ -9,30 +9,26 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class MainServer {
-    // Streams for interaction with the client
-    private DataOutputStream infoToClient;
-    private ObjectInputStream infoFromClient;
-
-    // Connector
-    private DBConnector connector = new DBConnector();
-
     // Constructor
     public MainServer() {
         try {
             ServerSocket serverSocket = new ServerSocket(8000);
             // identify each client with a number
-            int clientNo = 1;
+            int clientNo = 0;
 
+            System.out.println("Server started");
             while(true) {
                 // create a set of 1 thread and 1 socket for every single new client
                 Socket socket = serverSocket.accept();
+                System.out.println("Request from " + socket.getInetAddress());
                 HandleClient newClient = new HandleClient(socket);
 
                 // Start the thread for the new client
-                new Thread(newClient).start();
+                newClient.start();
 
                 // Prepare for next client
                 clientNo++;
+                System.out.println("Client now: " + clientNo);
             }
         }
         catch(IOException ex) {
@@ -41,9 +37,15 @@ public class MainServer {
     }
 
     // Inner class for handle multi clients
-    class HandleClient implements Runnable {
+    class HandleClient extends Thread {
         // This would be the unique socket for the specific client
         private Socket socket;
+
+        // Streams for interaction with the client
+        private DataOutputStream infoToClient;
+        private ObjectInputStream infoFromClient;
+
+        // Connector
         private DBConnector connector;
 
         public HandleClient(Socket socket) {
@@ -59,41 +61,79 @@ public class MainServer {
                 // Prepare info that will be sent to the client
                 infoToClient = new DataOutputStream(socket.getOutputStream());
 
-                // Read
-                Object infoObject = infoFromClient.readObject();
+                while(true) {
+                    // Read
+                    Object infoObject = infoFromClient.readObject();
 
-                UserInfo userInfo = (UserInfo)infoObject;
+                    UserInfo userInfo = (UserInfo) infoObject;
 
-                connector = new DBConnector();
+                    connector = new DBConnector();
+                    connector.connect();
 
-                // Valid connection
-                if(connector.getConnStat()) {
-                    // 0 for logIn
-                    if (userInfo.getMode() == 0) {
-                        switch(connector.findUser_Login(userInfo.getUserName(), userInfo.getPassword())) {
-                            case 0: infoToClient.writeInt(0); break;
-                            case 1: infoToClient.writeInt(1); break;
-                            case 2: infoToClient.writeInt(2); break;
-                            default: infoToClient.writeInt(-1);
+                    // Valid connection
+                    if (connector.getConnStat()) {
+                        // 0 for logIn
+                        if (userInfo.getMode() == 0) {
+                            System.out.println("=====Login=====");
+                            System.out.println("User: " + userInfo.getUserName());
+                            System.out.println("Password: " + userInfo.getPassword());
+                            switch (connector.findUser_Login(userInfo.getUserName(), userInfo.getPassword())) {
+                                case 0:
+                                    infoToClient.writeInt(0);
+                                    System.out.println("LogIn stat: 0");
+                                    break;
+                                case 1:
+                                    infoToClient.writeInt(1);
+                                    System.out.println("LogIn stat: 1");
+                                    break;
+                                case 2:
+                                    infoToClient.writeInt(2);
+                                    System.out.println("LogIn stat: 2");
+                                    break;
+                                default:
+                                    infoToClient.writeInt(-1);
+                                    System.out.println("LogIn stat: -1");
+                            }
+                            System.out.println("=====^^^^^=====");
+                        }
+                        // 1 for signUp
+                        else if (userInfo.getMode() == 1) {
+                            System.out.println("=====Register=====");
+                            System.out.println("User: " + userInfo.getUserName());
+                            System.out.println("Password: " + userInfo.getPassword());
+                            System.out.println("Confirm: " + userInfo.getConfirm());
+                            switch (connector.findUser_Register(userInfo.getUserName(), userInfo.getPassword(), userInfo.getConfirm())) {
+                                case 0:
+                                    infoToClient.writeInt(0);
+                                    System.out.println("Register stat: 0");
+                                    break;
+                                case 1:
+                                    infoToClient.writeInt(1);
+                                    System.out.println("Register stat: 1");
+                                    break;
+                                case 2:
+                                    infoToClient.writeInt(2);
+                                    System.out.println("Register stat: 2");
+                                    break;
+                                default:
+                                    infoToClient.writeInt(-1);
+                                    System.out.println("Register stat: -1");
+                            }
+                            System.out.println("=====^^^^^^^^=====");
                         }
                     }
-                    // 1 for signUp
-                    else if (userInfo.getMode() == 1) {
-                        switch(connector.findUser_Register(userInfo.getUserName(), userInfo.getPassword(), userInfo.getConfirm())) {
-                            case 0: infoToClient.writeInt(0); break;
-                            case 1: infoToClient.writeInt(1); break;
-                            case 2: infoToClient.writeInt(2); break;
-                            default: infoToClient.writeInt(-1);
-                        }
-                    }
-                }
-            }
+                } // while client not logged out
+            } // try
             catch(IOException ex) {
-                System.err.println("Server:" + ex);
+                System.err.println("Server: " + ex);
             }
             catch(ClassNotFoundException ex) {
-                System.err.println("Server:" + ex);
+                System.err.println("Server: " + ex);
             }
         }
+    } // Inner class ClientHandler
+
+    public static void main(String[] args) {
+        MainServer server = new MainServer();
     }
 }
