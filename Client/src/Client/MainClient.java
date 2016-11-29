@@ -1,15 +1,15 @@
 package Client;
 
 import ADT.UserInfo;
-import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class MainClient {
     // Streams for interaction with the server
     private ObjectOutputStream infoToServer;
-    private DataInputStream infoFromServer;
+    private ObjectInputStream infoFromServer;
     // User info
     private UserInfo userInfo;
 
@@ -24,7 +24,7 @@ public class MainClient {
             socket = new Socket("172.26.91.76", 8000);
 
             // Create streams
-            infoFromServer = new DataInputStream(socket.getInputStream());
+            infoFromServer = new ObjectInputStream(socket.getInputStream());
             infoToServer= new ObjectOutputStream(socket.getOutputStream());
         }
         catch (IOException ex) {
@@ -44,10 +44,14 @@ public class MainClient {
             infoToServer.writeObject(userInfo);
             infoToServer.flush(); // Immediately send it out
 
-            flag = infoFromServer.readInt(); // 0 1 2, or exception -1
+            flag = (Integer)infoFromServer.readObject(); // 0 1 2, or exception -1
             System.out.println("LogIn stat: " + flag);
         }
         catch(IOException ex) {
+            System.err.println("Client: " + ex);
+            flag = -1;
+        }
+        catch(ClassNotFoundException ex) {
             System.err.println("Client: " + ex);
             flag = -1;
         }
@@ -68,11 +72,15 @@ public class MainClient {
             infoToServer.writeObject(userInfo);
             infoToServer.flush(); // Immediately send it out
 
-            flag = infoFromServer.readInt(); // 0 1 2, or exception -1
+            flag = (Integer)infoFromServer.readObject(); // 0 1 2, or exception -1
             System.out.println("Register stat: " + flag);
         }
         catch(IOException ex) {
             System.err.println("Client:" + ex);
+            flag = -1;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
             flag = -1;
         }
 

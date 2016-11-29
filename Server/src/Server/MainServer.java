@@ -2,9 +2,9 @@ package Server;
 
 import ADT.UserInfo;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -42,7 +42,7 @@ public class MainServer {
         private Socket socket;
 
         // Streams for interaction with the client
-        private DataOutputStream infoToClient;
+        private ObjectOutputStream infoToClient;
         private ObjectInputStream infoFromClient;
 
         // Connector
@@ -59,16 +59,16 @@ public class MainServer {
                 // Info that comes from the client
                 infoFromClient = new ObjectInputStream(socket.getInputStream());
                 // Prepare info that will be sent to the client
-                infoToClient = new DataOutputStream(socket.getOutputStream());
+                infoToClient = new ObjectOutputStream(socket.getOutputStream());
+
+                connector = new DBConnector();
+                connector.connect();
 
                 while(true) {
                     // Read
                     Object infoObject = infoFromClient.readObject();
 
                     UserInfo userInfo = (UserInfo) infoObject;
-
-                    connector = new DBConnector();
-                    connector.connect();
 
                     // Valid connection
                     if (connector.getConnStat()) {
@@ -79,19 +79,19 @@ public class MainServer {
                             System.out.println("Password: " + userInfo.getPassword());
                             switch (connector.findUser_Login(userInfo.getUserName(), userInfo.getPassword())) {
                                 case 0:
-                                    infoToClient.writeInt(0);
+                                    infoToClient.writeObject(new Integer(0));
                                     System.out.println("LogIn stat: 0");
                                     break;
                                 case 1:
-                                    infoToClient.writeInt(1);
+                                    infoToClient.writeObject(new Integer(1));
                                     System.out.println("LogIn stat: 1");
                                     break;
                                 case 2:
-                                    infoToClient.writeInt(2);
+                                    infoToClient.writeObject(new Integer(2));
                                     System.out.println("LogIn stat: 2");
                                     break;
                                 default:
-                                    infoToClient.writeInt(-1);
+                                    infoToClient.writeObject(new Integer(-1));
                                     System.out.println("LogIn stat: -1");
                             }
                             System.out.println("=====^^^^^=====");
@@ -104,19 +104,19 @@ public class MainServer {
                             System.out.println("Confirm: " + userInfo.getConfirm());
                             switch (connector.findUser_Register(userInfo.getUserName(), userInfo.getPassword(), userInfo.getConfirm())) {
                                 case 0:
-                                    infoToClient.writeInt(0);
+                                    infoToClient.writeObject(new Integer(0));
                                     System.out.println("Register stat: 0");
                                     break;
                                 case 1:
-                                    infoToClient.writeInt(1);
+                                    infoToClient.writeObject(new Integer(1));
                                     System.out.println("Register stat: 1");
                                     break;
                                 case 2:
-                                    infoToClient.writeInt(2);
+                                    infoToClient.writeObject(new Integer(2));
                                     System.out.println("Register stat: 2");
                                     break;
                                 default:
-                                    infoToClient.writeInt(-1);
+                                    infoToClient.writeObject(new Integer(-1));
                                     System.out.println("Register stat: -1");
                             }
                             System.out.println("=====^^^^^^^^=====");
