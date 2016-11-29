@@ -86,4 +86,24 @@ public class MainClient {
 
         return flag;
     }
+
+    public UserInfo query(String word, int type) {
+        UserInfo request = new UserInfo(word, 2, type);
+        UserInfo respond;
+        try {
+            infoToServer.writeObject(request);
+            infoToServer.flush(); // Immediately send it out
+
+            respond = (UserInfo)infoFromServer.readObject();
+        }
+        catch(IOException ex) {
+            System.err.println("Client:" + ex);
+            return null;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
+            return null;
+        }
+        return respond;
+    }
 }

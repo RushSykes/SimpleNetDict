@@ -15,7 +15,7 @@ public class UserInfo implements Serializable {
 
     private int queryType;
     private String word;
-    private Youdao resultYoudao;
+    private String result;
 
     public UserInfo(String userName, String password, int mode) {
         this.userName = userName;
@@ -57,15 +57,11 @@ public class UserInfo implements Serializable {
         return word;
     }
 
-    public Object getResult(int type) {
-        if(queryType == 0)
-            return resultYoudao;
-        else
-            return null;
+    public String getResult() {
+            return result;
     }
 
-    public void setResult(Object result) {
-        if(getQueryType() == 0)
-            resultYoudao = (Youdao)result;
+    public void setResult(String result) {
+        this.result = result;
     }
 }

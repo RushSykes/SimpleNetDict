@@ -1,6 +1,7 @@
 package Server;
 
 import ADT.UserInfo;
+import ADT.Youdao;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -120,6 +121,22 @@ public class MainServer {
                                     System.out.println("Register stat: -1");
                             }
                             System.out.println("=====^^^^^^^^=====");
+                        }
+                        // 2 for query
+                        else if(userInfo.getMode() == 2) {
+                            switch(userInfo.getQueryType()) {
+                                // 0 for Youdao
+                                case 0:
+                                    Youdao search = new Youdao();
+                                    // Search the words using API
+                                    search.query(userInfo.getWord());
+                                    // Add explanation data to teh userInfo data pack
+                                    userInfo.setResult(search.getExplains());
+                                    // Send it back
+                                    infoToClient.writeObject(userInfo);
+                                    break;
+                                default:
+                            }
                         }
                     }
                 } // while client not logged out

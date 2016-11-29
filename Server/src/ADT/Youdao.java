@@ -15,8 +15,8 @@ import java.util.ArrayList;
 public class Youdao {
     private String phoneticUS;
     private String phoneticUK;
-    private ArrayList<String> explains;
-    private ArrayList<String> webExplains;
+    private String explains;
+    private String webExplains;
     private int errorCode;
 
     public String getPhoneticUS() {
@@ -27,11 +27,11 @@ public class Youdao {
         return phoneticUK;
     }
 
-    public ArrayList<String> getExplains() {
+    public String getExplains() {
         return explains;
     }
 
-    public ArrayList<String> getWebExplains() {
+    public String getWebExplains() {
         return webExplains;
     }
 
@@ -95,7 +95,7 @@ public class Youdao {
         for(int i = 0; i < explainAr.size(); i++) {
             String temp = explainAr.get(i).getAsString();
             temp = temp.replaceAll("\"", "");
-            explains.add(temp);
+            explains += (temp + "\n");
         }
     }
 }

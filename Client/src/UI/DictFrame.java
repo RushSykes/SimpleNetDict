@@ -1,5 +1,6 @@
 package UI;
 
+import ADT.UserInfo;
 import Client.MainClient;
 import javafx.application.Application;
 import javafx.event.*;
@@ -295,6 +296,24 @@ public class DictFrame extends Application {
 
                 // Assign it to the stage, whilst cancel teh assignment of welcome scene
                 primaryStage.setScene(signUpScene);
+            }
+        });
+
+        searchButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String word = searchWordTextField.getText();
+                /* TODO: Perhaps we need to check if the input is valid first
+                later...
+                */
+                UserInfo result = client.query(word, 0);
+                switch(result.getQueryType()) {
+                    // 0 for Youdao
+                    case 0:
+                        fromYoudao.setText(result.getResult());
+                        break;
+                    default:
+                }
             }
         });
 
