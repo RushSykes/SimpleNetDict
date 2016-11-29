@@ -24,8 +24,9 @@ public class MainClient {
             socket = new Socket("172.26.91.76", 8000);
 
             // Create streams
-            infoFromServer = new ObjectInputStream(socket.getInputStream());
             infoToServer= new ObjectOutputStream(socket.getOutputStream());
+            infoToServer.flush();
+            infoFromServer = new ObjectInputStream(socket.getInputStream());
         }
         catch (IOException ex) {
             System.err.println("Client: " + ex);

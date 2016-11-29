@@ -58,9 +58,12 @@ public class MainServer {
             // Handle client info and respond
             try {
                 // Info that comes from the client
-                infoFromClient = new ObjectInputStream(socket.getInputStream());
+                System.out.println(socket.getInputStream());
+
                 // Prepare info that will be sent to the client
                 infoToClient = new ObjectOutputStream(socket.getOutputStream());
+                infoToClient.flush();
+                infoFromClient = new ObjectInputStream(socket.getInputStream());
 
                 connector = new DBConnector();
                 connector.connect();
