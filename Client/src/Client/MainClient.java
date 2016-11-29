@@ -21,7 +21,7 @@ public class MainClient {
     public MainClient() {
         try {
             // Establish connection to server
-            socket = new Socket("172.26.7.66", 8000);
+            socket = new Socket("172.26.91.76", 8000);
 
             // Create streams
             infoFromServer = new DataInputStream(socket.getInputStream());

@@ -20,6 +20,7 @@ public class DictFrame extends Application {
     // Top-level scene
     private Scene welcomeScene;
     private Scene signUpScene;
+    private Scene searchScene;
 
     // Widgets of welcomeScene
     private GridPane welcomePane;
@@ -40,6 +41,16 @@ public class DictFrame extends Application {
     private HBox regButtonHBox;
     private Button registerButton, backButton;
     final private Text regInfo = new Text();
+
+    // Widgets of searchScene
+    private GridPane searchPane;
+    private Label searchWord;
+    private TextField searchWordTextField;
+    private TextArea fromBaidu, fromYoudao, fromBing;
+    private Button searchButton;
+    private ToggleButton likeBaidu, likeYoudao, likeBing;
+    private CheckBox checkBaidu, checkYoudao, checkBing;
+    private ListView<String> currentUser;
 
     // One client, one dict frame
     private MainClient client = new MainClient();
@@ -138,6 +149,65 @@ public class DictFrame extends Application {
         signUpPane.add(regButtonHBox, 1, 5);
 
         signUpScene = new Scene(signUpPane, 480, 640);
+
+        // ===============================================================
+        // Search scene
+        searchPane = new GridPane();
+        searchPane.setAlignment(Pos.CENTER);
+        searchPane.setHgap(10);
+        searchPane.setVgap(10);
+        searchPane.setPadding(new Insets(25, 25, 25, 25));
+
+        /*
+          Label searchWord;
+          TextField searchWordTextField;
+          Button searchButton;
+          ListView currentUser;
+          CheckBox checkBaidu, checkYoudao, checkBing;
+          ToggleButton likeBaidu, likeYoudao, likeBing;
+         */
+        searchWord = new Label("Search:");
+        searchPane.add(searchWord, 0, 0);
+
+        searchWordTextField = new TextField();
+        GridPane.setColumnSpan(searchWordTextField, 2);
+        searchPane.add(searchWordTextField, 1, 0);
+
+        searchButton = new Button("Search");
+        searchPane.add(searchButton, 3, 0);
+
+        currentUser = new ListView<>();
+        GridPane.setRowSpan(currentUser, 3);
+        searchPane.add(currentUser, 0, 1);
+
+        checkBaidu = new CheckBox("Baidu");
+        searchPane.add(checkBaidu, 1, 1);
+
+        checkYoudao = new CheckBox("Youdao");
+        searchPane.add(checkYoudao, 1, 2);
+
+        checkBing = new CheckBox("Bing");
+        searchPane.add(checkBing, 1, 3);
+
+        fromBaidu = new TextArea();
+        searchPane.add(fromBaidu, 2, 1);
+
+        fromYoudao = new TextArea();
+        searchPane.add(fromYoudao, 2, 2);
+
+        fromBing = new TextArea();
+        searchPane.add(fromBing, 2, 3);
+
+        likeBaidu = new ToggleButton("like it");
+        searchPane.add(likeBaidu, 3, 1);
+
+        likeYoudao = new ToggleButton("like it");
+        searchPane.add(likeYoudao, 3, 2);
+
+        likeBing = new ToggleButton("like it");
+        searchPane.add(likeBing, 3, 3);
+
+        searchScene = new Scene(searchPane, 1200, 800);
 
         // =============================================================
         // Listener and handlers
