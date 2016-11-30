@@ -3,6 +3,8 @@ package UI;
 import ADT.UserInfo;
 import Client.MainClient;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -47,10 +49,11 @@ public class DictFrame extends Application {
     private GridPane searchPane;
     private Label searchWord;
     private TextField searchWordTextField;
-    private TextArea fromBaidu, fromYoudao, fromBing;
+    private TextArea fromJinshan, fromYoudao, fromBing;
     private Button searchButton;
-    private ToggleButton likeBaidu, likeYoudao, likeBing;
-    private CheckBox checkBaidu, checkYoudao, checkBing;
+    private ToggleButton likeJinshan, likeYoudao, likeBing;
+    private CheckBox checkJinshan, checkYoudao, checkBing;
+    private boolean[] searchFlag;
     private ListView<String> currentUser;
 
     // One client, one dict frame
@@ -164,8 +167,8 @@ public class DictFrame extends Application {
           TextField searchWordTextField;
           Button searchButton;
           ListView currentUser;
-          CheckBox checkBaidu, checkYoudao, checkBing;
-          ToggleButton likeBaidu, likeYoudao, likeBing;
+          CheckBox checkJinshan, checkYoudao, checkBing;
+          ToggleButton likeJinshan, likeYoudao, likeBing;
          */
         searchWord = new Label("Search:");
         searchPane.add(searchWord, 0, 0);
@@ -181,8 +184,8 @@ public class DictFrame extends Application {
         GridPane.setRowSpan(currentUser, 3);
         searchPane.add(currentUser, 0, 1);
 
-        checkBaidu = new CheckBox("Baidu");
-        searchPane.add(checkBaidu, 1, 1);
+        checkJinshan = new CheckBox("Jinshan");
+        searchPane.add(checkJinshan, 1, 1);
 
         checkYoudao = new CheckBox("Youdao");
         searchPane.add(checkYoudao, 1, 2);
@@ -190,8 +193,13 @@ public class DictFrame extends Application {
         checkBing = new CheckBox("Bing");
         searchPane.add(checkBing, 1, 3);
 
-        fromBaidu = new TextArea();
-        searchPane.add(fromBaidu, 2, 1);
+        searchFlag = new boolean[3];
+        searchFlag[0] = false;
+        searchFlag[1] = false;
+        searchFlag[2] = false;
+
+        fromJinshan = new TextArea();
+        searchPane.add(fromJinshan, 2, 1);
 
         fromYoudao = new TextArea();
         searchPane.add(fromYoudao, 2, 2);
@@ -199,8 +207,8 @@ public class DictFrame extends Application {
         fromBing = new TextArea();
         searchPane.add(fromBing, 2, 3);
 
-        likeBaidu = new ToggleButton("like it");
-        searchPane.add(likeBaidu, 3, 1);
+        likeJinshan = new ToggleButton("like it");
+        searchPane.add(likeJinshan, 3, 1);
 
         likeYoudao = new ToggleButton("like it");
         searchPane.add(likeYoudao, 3, 2);
@@ -225,6 +233,10 @@ public class DictFrame extends Application {
                     case 0:
                         userNotExist.setFill(Color.FORESTGREEN);
                         userNotExist.setText("Logged in");
+                        userTextField.clear();
+                        passwordField.clear();
+                        userNotExist.setText("");
+                        primaryStage.setScene(searchScene);
                         break;
                     case 1:
                         userNotExist.setFill(Color.FIREBRICK);
@@ -294,7 +306,7 @@ public class DictFrame extends Application {
                 passwordField.clear();
                 userNotExist.setText("");
 
-                // Assign it to the stage, whilst cancel teh assignment of welcome scene
+                // Assign it to the stage, whilst cancel the assignment of welcome scene
                 primaryStage.setScene(signUpScene);
             }
         });
@@ -306,20 +318,92 @@ public class DictFrame extends Application {
                 /* TODO: Perhaps we need to check if the input is valid first
                 later...
                 */
-                UserInfo result = client.query(word, 0);
-                switch(result.getQueryType()) {
-                    // 0 for Youdao
-                    case 0:
-                        fromYoudao.setText(result.getResult());
-                        break;
-                    default:
+                if(onlyOne()) {
+                    UserInfo result;
+                    if(searchFlag[0]) result = client.query(word, 0); // Youdao
+                    else if(searchFlag[1]) result = client.query(word, 1); // Bing
+                    else result = client.query(word, 2); // Jinshan
+
+                    switch (result.getQueryType()) {
+                        // 0 for Youdao
+                        case 0:
+                            fromYoudao.setText(result.getResult());
+                            break;
+                        // 1 for Bing
+                        case 1:
+                            fromBing.setText(result.getResult());
+                            break;
+                        // 2 for Jinshan
+                        case 2:
+                            fromJinshan.setText(result.getResult());
+                            break;
+                        default:
+                    }
+                }
+                else if(all()) {
+                    UserInfo[] result;
+                    result = client.queryAll(word);
+                    fromYoudao.setText(result[0].getResult());
+                    fromBing.setText(result[1].getResult());
+                    fromJinshan.setText(result[2].getResult());
                 }
             }
         });
 
+        checkYoudao.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(newValue == true)
+                    searchFlag[0] = true;
+                else
+                    searchFlag[0] = false;
+            }
+        });
+
+        checkBing.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(newValue == true)
+                    searchFlag[1] = true;
+                else
+                    searchFlag[1] = false;
+            }
+        });
+
+        checkJinshan.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if(newValue == true)
+                    searchFlag[2] = true;
+                else
+                    searchFlag[2] = false;
+            }
+        });
+
+
         // Assign the scene to the stage
         primaryStage.setScene(welcomeScene);
         primaryStage.show();
+    }
+
+    private boolean onlyOne() {
+        if(
+                (searchFlag[0] && !searchFlag[1] && !searchFlag[2]) ||
+                (!searchFlag[0] && searchFlag[1] && !searchFlag[2]) ||
+                 (!searchFlag[0] && !searchFlag[1] && searchFlag[2])
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean all() {
+        if(                (searchFlag[0] && searchFlag[1] && searchFlag[2]) ||
+                (!searchFlag[0] && !searchFlag[1] && !searchFlag[2])
+                ) {
+            return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) {

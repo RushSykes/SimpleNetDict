@@ -10,11 +10,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class Youdao {
+public class Jinshan {
     private String phoneticUS;
     private String phoneticUK;
-    private String explains = "";
+    private String explains;
     private String webExplains;
     private int errorCode;
 
@@ -43,7 +44,7 @@ public class Youdao {
         BufferedReader in = null;
         try {
             URL urlNameString = new URL(
-                    "http://fanyi.youdao.com/openapi.do?keyfrom=SimpleNetDict&key=462535873&type=data&doctype=json&version=1.1&q=" + word);
+                    "http://dict-co.iciba.com/api/dictionary.php?key=1537178571501B9DCE979B3B16C3A72D&type=json&w="+word);
 
             // Create connection with the URL
             HttpURLConnection connection = (HttpURLConnection)urlNameString.openConnection();
@@ -84,21 +85,27 @@ public class Youdao {
         // Process result data pack
         JsonObject object = new JsonParser().parse(pack).getAsJsonObject();
 
-        errorCode = object.get("errorCode").getAsInt();
-        if(errorCode != 0)
-            return;
+        JsonArray info = object.get("symbols").getAsJsonArray();
 
-        phoneticUS = object.get("basic").getAsJsonObject().get("us-phonetic").getAsString();
-        phoneticUK = object.get("basic").getAsJsonObject().get("uk-phonetic").getAsString();
+        phoneticUS = info.get(0).getAsJsonObject().get("ph_am").getAsString();
+        phoneticUK = info.get(0).getAsJsonObject().get("ph_en").getAsString();
+
+        explains = "";
 
         explains += (word +"\n美:[" + phoneticUS + "]\t"
                 + "英:[" + phoneticUK  + "]\n\n");
 
-        JsonArray explainAr = object.get("basic").getAsJsonObject().get("explains").getAsJsonArray();
-        for(int i = 0; i < explainAr.size(); i++) {
-            String temp = explainAr.get(i).getAsString();
-            temp = temp.replaceAll("\"", "");
-            explains += (temp + "\n");
+
+        JsonArray parts = info.get(0).getAsJsonObject().get("parts").getAsJsonArray();
+
+        for(int i = 0 ; i < parts.size(); i++) {
+            JsonObject temp = parts.get(i).getAsJsonObject();
+            explains += (temp.get("part").getAsString() + "\t");
+            JsonArray tempAr = temp.get("means").getAsJsonArray();
+            for(int j = 0; j < tempAr.size(); j++) {
+                explains += (tempAr.get(j).getAsString() + " ");
+            }
+            explains += "\n";
         }
     }
 }

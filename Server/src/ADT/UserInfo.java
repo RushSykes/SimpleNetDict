@@ -53,6 +53,10 @@ public class UserInfo implements Serializable {
         return queryType;
     }
 
+    public void setQueryType(int type) {
+        this.queryType = type;
+    }
+
     public String getWord() {
         return word;
     }

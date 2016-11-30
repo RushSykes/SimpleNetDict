@@ -1,7 +1,9 @@
 package Server;
 
+import ADT.Jinshan;
 import ADT.UserInfo;
 import ADT.Youdao;
+import ADT.Bing;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,12 +13,11 @@ import java.net.Socket;
 
 public class MainServer {
     // Constructor
+    int clientNo = 0;
     public MainServer() {
         try {
             ServerSocket serverSocket = new ServerSocket(8000);
             // identify each client with a number
-            int clientNo = 0;
-
             System.out.println("Server started");
             while(true) {
                 // create a set of 1 thread and 1 socket for every single new client
@@ -130,12 +131,26 @@ public class MainServer {
                             switch(userInfo.getQueryType()) {
                                 // 0 for Youdao
                                 case 0:
-                                    Youdao search = new Youdao();
+                                    Youdao search0 = new Youdao();
                                     // Search the words using API
-                                    search.query(userInfo.getWord());
+                                    search0.query(userInfo.getWord());
                                     // Add explanation data to teh userInfo data pack
-                                    userInfo.setResult(search.getExplains());
+                                    userInfo.setResult(search0.getExplains());
                                     // Send it back
+                                    infoToClient.writeObject(userInfo);
+                                    break;
+                                // 1 for Bing
+                                case 1:
+                                    Bing search1 = new Bing();
+                                    search1.query(userInfo.getWord());
+                                    userInfo.setResult(search1.getExplains());
+                                    infoToClient.writeObject(userInfo);
+                                    break;
+                                //2 for Jinshan
+                                case 2:
+                                    Jinshan search2 = new Jinshan();
+                                    search2.query(userInfo.getWord());
+                                    userInfo.setResult(search2.getExplains());
                                     infoToClient.writeObject(userInfo);
                                     break;
                                 default:

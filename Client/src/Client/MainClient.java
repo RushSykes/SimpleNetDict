@@ -107,4 +107,40 @@ public class MainClient {
         }
         return respond;
     }
+
+    public UserInfo[] queryAll(String word) {
+        UserInfo[] request = new UserInfo[3];
+        UserInfo[] respond = new UserInfo[3];
+
+        for(int i = 0 ; i < request.length; i++) {
+            request[i] = new UserInfo(word, 2, i);
+        }
+
+        try {
+            infoToServer.writeObject(request[0]);
+            infoToServer.flush(); // Immediately send it out
+
+            respond[0] = (UserInfo)infoFromServer.readObject();
+
+            infoToServer.writeObject(request[1]);
+            infoToServer.flush(); // Immediately send it out
+
+            respond[1] = (UserInfo)infoFromServer.readObject();
+
+            infoToServer.writeObject(request[2]);
+            infoToServer.flush(); // Immediately send it out
+
+            respond[2] = (UserInfo)infoFromServer.readObject();
+        }
+
+        catch(IOException ex) {
+            System.err.println("Client:" + ex);
+            return null;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
+            return null;
+        }
+        return respond;
+    }
 }
