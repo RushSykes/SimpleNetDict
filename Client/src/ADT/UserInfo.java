@@ -14,17 +14,30 @@ public class UserInfo implements Serializable {
     private String confirm;
 
     private int queryType;
+    private int likeType;
+    private boolean liked;
     private String word;
     private String result;
+    private int dictScore;
 
+    // For signup and login
     public UserInfo(String userName, String password, int mode) {
         this.userName = userName;
         this.password = password;
         this.mode = mode;
     }
 
+    // For query a word
     public UserInfo(String word, int mode, int type) {
         this.word = word;
+        this.mode = mode;
+        this.queryType = type;
+    }
+
+    // For thumb up
+    public UserInfo(String word, String user, int mode, int type) {
+        this.word = word;
+        this.userName = user;
         this.mode = mode;
         this.queryType = type;
     }
@@ -67,5 +80,21 @@ public class UserInfo implements Serializable {
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public boolean getLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
+    }
+
+    public int getDictScore() {
+        return dictScore;
+    }
+
+    public void setDictScore(int score) {
+        this.dictScore = score;
     }
 }

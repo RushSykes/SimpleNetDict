@@ -10,8 +10,6 @@ public class MainClient {
     // Streams for interaction with the server
     private ObjectOutputStream infoToServer;
     private ObjectInputStream infoFromServer;
-    // User info
-    private UserInfo userInfo;
 
     // Socket
     private Socket socket;
@@ -91,6 +89,7 @@ public class MainClient {
     public UserInfo query(String word, int type) {
         UserInfo request = new UserInfo(word, 2, type);
         UserInfo respond;
+
         try {
             infoToServer.writeObject(request);
             infoToServer.flush(); // Immediately send it out
@@ -133,6 +132,27 @@ public class MainClient {
             respond[2] = (UserInfo)infoFromServer.readObject();
         }
 
+        catch(IOException ex) {
+            System.err.println("Client:" + ex);
+            return null;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
+            return null;
+        }
+        return respond;
+    }
+
+    public UserInfo likeIt(String word, String user, int dictType) {
+        UserInfo request = new UserInfo(word, user, 3, dictType);
+        UserInfo respond;
+
+        try {
+            infoToServer.writeObject(request);
+            infoToServer.flush(); // Immediately send it out
+
+            respond = (UserInfo)infoFromServer.readObject();
+        }
         catch(IOException ex) {
             System.err.println("Client:" + ex);
             return null;

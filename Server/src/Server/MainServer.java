@@ -134,8 +134,10 @@ public class MainServer {
                                     Youdao search0 = new Youdao();
                                     // Search the words using API
                                     search0.query(userInfo.getWord());
-                                    // Add explanation data to teh userInfo data pack
+                                    // Add explanation data to the userInfo data pack
                                     userInfo.setResult(search0.getExplains());
+                                    // Add dictScore to the data pack
+                                    userInfo.setDictScore(connector.dictScore(0));
                                     // Send it back
                                     infoToClient.writeObject(userInfo);
                                     break;
@@ -144,6 +146,7 @@ public class MainServer {
                                     Bing search1 = new Bing();
                                     search1.query(userInfo.getWord());
                                     userInfo.setResult(search1.getExplains());
+                                    userInfo.setDictScore(connector.dictScore(1));
                                     infoToClient.writeObject(userInfo);
                                     break;
                                 //2 for Jinshan
@@ -151,10 +154,28 @@ public class MainServer {
                                     Jinshan search2 = new Jinshan();
                                     search2.query(userInfo.getWord());
                                     userInfo.setResult(search2.getExplains());
+                                    userInfo.setDictScore(connector.dictScore(2));
                                     infoToClient.writeObject(userInfo);
                                     break;
                                 default:
                             }
+                        }
+                        // 3 for thumbup
+                        else if(userInfo.getMode() == 3){
+                            int stat;
+                            String word = userInfo.getWord();
+                            String user = userInfo.getUserName();
+                            int dictType = userInfo.getQueryType();
+                            stat = connector.wordLiked(word, user, dictType);
+                            // 0 he liked it this time
+                            if(stat == 0) {
+                                userInfo.setLiked(true);
+                            }
+                            // 1 he disliked it this time
+                            else if(stat == 1) {
+                                userInfo.setLiked(false);
+                            }
+                            infoToClient.writeObject(userInfo);
                         }
                     }
                 } // while client not logged out

@@ -44,7 +44,7 @@ public class Jinshan {
         BufferedReader in = null;
         try {
             URL urlNameString = new URL(
-                    "http://dict-co.iciba.com/api/dictionary.php?key=1537178571501B9DCE979B3B16C3A72D&type=json&w="+word);
+                    "http://dict-co.iciba.com/api/dictionary.php?key=1537178571501B9DCE979B3B16C3A72D&type=json&w="+word.toLowerCase());
 
             // Create connection with the URL
             HttpURLConnection connection = (HttpURLConnection)urlNameString.openConnection();

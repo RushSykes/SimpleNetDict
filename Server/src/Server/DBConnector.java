@@ -124,4 +124,75 @@ public class DBConnector {
         System.out.println("Connection with database not established");
         return -1;
     }
+
+    // =========================================
+    // Deal with thumb up data
+    // Return :
+    // 0, for this user thumb this up
+    // 1, this user has already thumb this up, so he's disliking it
+    public int wordLiked(String word, String user, int dictType) {
+        if(connDone) {
+            try {
+                String dictName = null;
+                switch(dictType) {
+                    case 0: dictName = "Youdao"; break;
+                    case 1: dictName = "Bing"; break;
+                    case 2: dictName = "Jinshan"; break;
+                    default:
+                }
+                Statement stmt = DB_Conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM thumbup WHERE word = \'" + word + "\' AND dictName = \'" + dictName + "\' AND user = \'" + user + "\'");
+
+                // If this user has thumbed up for this word before, now he's canceling it
+                while(rs.next()) {
+                    stmt.executeUpdate("DELETE FROM thumbup WHERE word = \'" + word + "\' AND dictName = \'" + dictName + "\' AND user = \'" + user + "\'");
+                    stmt.executeUpdate("UPDATE dicts SET dictScore = dictScore - 1 WHERE dictName = \'" + dictName + "\'");
+                    return 1;
+                }
+                // This user thumb up the word this time (he may have disliked it before)
+                stmt.executeUpdate("INSERT INTO thumbup (word, dictName, user) VALUES (\'" + word + "\', \'" + dictName + "\', \'" + user +"\')");
+                stmt.executeUpdate("UPDATE dicts SET dictScore = dictScore + 1 WHERE dictName = \'" + dictName + "\'");
+                return 0;
+            }
+            catch (SQLException ex) {
+                System.out.println("Thumb Up");
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+                return -1;
+            }
+        }
+        System.out.println("Connection with database not established");
+        return -1;
+    }
+    public int dictScore(int dictType) {
+        if(connDone) {
+            int score = 0;
+            try {
+                String dictName = null;
+                switch(dictType) {
+                    case 0: dictName = "Youdao"; break;
+                    case 1: dictName = "Bing"; break;
+                    case 2: dictName = "Jinshan"; break;
+                    default:
+                }
+
+                Statement stmt = DB_Conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM dicts WHERE dictName = \'" + dictName + "\'");
+                while(rs.next()) {
+                    score = rs.getInt("dictScore");
+                }
+                return score;
+            }
+            catch (SQLException ex) {
+                System.out.println("Thumb Up");
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+                return -1;
+            }
+        }
+        System.out.println("Connection with database not established");
+        return -1;
+    }
 }

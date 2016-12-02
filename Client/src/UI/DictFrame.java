@@ -49,15 +49,16 @@ public class DictFrame extends Application {
     private GridPane searchPane;
     private Label searchWord;
     private TextField searchWordTextField;
-    private TextArea fromJinshan, fromYoudao, fromBing;
     private Button searchButton;
-    private ToggleButton likeJinshan, likeYoudao, likeBing;
-    private CheckBox checkJinshan, checkYoudao, checkBing;
+    private TextArea fromYoudao, fromBing, fromJinshan;
+    private ToggleButton likeYoudao, likeBing, likeJinshan;
+    private CheckBox checkYoudao, checkBing, checkJinshan;
     private boolean[] searchFlag;
     private ListView<String> currentUser;
 
     // One client, one dict frame
     private MainClient client = new MainClient();
+    private String clientUser;
 
     @Override
     public void start(Stage primaryStage) {
@@ -184,37 +185,34 @@ public class DictFrame extends Application {
         GridPane.setRowSpan(currentUser, 3);
         searchPane.add(currentUser, 0, 1);
 
-        checkJinshan = new CheckBox("Jinshan");
-        searchPane.add(checkJinshan, 1, 1);
-
+        // Checkboxes
         checkYoudao = new CheckBox("Youdao");
-        searchPane.add(checkYoudao, 1, 2);
-
+        searchPane.add(checkYoudao, 1, 1);
         checkBing = new CheckBox("Bing");
-        searchPane.add(checkBing, 1, 3);
+        searchPane.add(checkBing, 1, 2);
+        checkJinshan = new CheckBox("Jinshan");
+        searchPane.add(checkJinshan, 1, 3);
 
         searchFlag = new boolean[3];
         searchFlag[0] = false;
         searchFlag[1] = false;
         searchFlag[2] = false;
 
-        fromJinshan = new TextArea();
-        searchPane.add(fromJinshan, 2, 1);
-
+        // Text areas
         fromYoudao = new TextArea();
-        searchPane.add(fromYoudao, 2, 2);
-
+        searchPane.add(fromYoudao, 2, 1);
         fromBing = new TextArea();
-        searchPane.add(fromBing, 2, 3);
+        searchPane.add(fromBing, 2, 2);
+        fromJinshan = new TextArea();
+        searchPane.add(fromJinshan, 2, 3);
 
-        likeJinshan = new ToggleButton("like it");
-        searchPane.add(likeJinshan, 3, 1);
-
+        // Like buttons
         likeYoudao = new ToggleButton("like it");
-        searchPane.add(likeYoudao, 3, 2);
-
+        searchPane.add(likeYoudao, 3, 1);
         likeBing = new ToggleButton("like it");
-        searchPane.add(likeBing, 3, 3);
+        searchPane.add(likeBing, 3, 2);
+        likeJinshan = new ToggleButton("like it");
+        searchPane.add(likeJinshan, 3, 3);
 
         searchScene = new Scene(searchPane, 1200, 800);
 
@@ -231,6 +229,7 @@ public class DictFrame extends Application {
 
                 switch (flag) {
                     case 0:
+                        clientUser = userTextField.getText();
                         userNotExist.setFill(Color.FORESTGREEN);
                         userNotExist.setText("Logged in");
                         userTextField.clear();
@@ -340,12 +339,23 @@ public class DictFrame extends Application {
                         default:
                     }
                 }
+
+                // TODO: Results need to be sorted
                 else if(all()) {
                     UserInfo[] result;
                     result = client.queryAll(word);
                     fromYoudao.setText(result[0].getResult());
                     fromBing.setText(result[1].getResult());
                     fromJinshan.setText(result[2].getResult());
+                }
+                // TODO: Results need to be sorted
+                else {
+                    for(int i = 0; i < searchFlag.length; i++) {
+                        if(searchFlag[i]) {
+                            UserInfo result;
+                            result = client.query(word, i);
+                        }
+                    }
                 }
             }
         });
@@ -360,6 +370,25 @@ public class DictFrame extends Application {
             }
         });
 
+        likeYoudao.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                UserInfo result;
+                result = client.likeIt(searchWordTextField.getText(), clientUser, 0);
+                // A like this time
+                if(result.getLiked()) {
+                    likeYoudao.setSelected(true);
+                    likeYoudao.setText("liked");
+                }
+                // A dislike this time
+                else {
+                    likeYoudao.setSelected(false);
+                    likeYoudao.setText("like it");
+                }
+            }
+        });
+
+
         checkBing.selectedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
@@ -367,6 +396,24 @@ public class DictFrame extends Application {
                     searchFlag[1] = true;
                 else
                     searchFlag[1] = false;
+            }
+        });
+
+        likeBing.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                UserInfo result;
+                result = client.likeIt(searchWordTextField.getText(), clientUser, 1);
+                // A like this time
+                if(result.getLiked()) {
+                    likeBing.setSelected(true);
+                    likeBing.setText("liked");
+                }
+                // A dislike this time
+                else {
+                    likeBing.setSelected(false);
+                    likeBing.setText("like it");
+                }
             }
         });
 
@@ -380,6 +427,23 @@ public class DictFrame extends Application {
             }
         });
 
+        likeJinshan.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                UserInfo result;
+                result = client.likeIt(searchWordTextField.getText(), clientUser, 2);
+                // A like this time
+                if(result.getLiked()) {
+                    likeJinshan.setSelected(true);
+                    likeJinshan.setText("liked");
+                }
+                // A dislike this time
+                else {
+                    likeJinshan.setSelected(false);
+                    likeJinshan.setText("like it");
+                }
+            }
+        });
 
         // Assign the scene to the stage
         primaryStage.setScene(welcomeScene);
