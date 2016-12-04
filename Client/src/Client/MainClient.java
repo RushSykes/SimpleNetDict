@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class MainClient {
     // Streams for interaction with the server
@@ -37,6 +38,7 @@ public class MainClient {
         // 0 for success
         // 1 for wrong password
         // 2 for username does not exist
+        // 3 for already logged in
         int flag;
         UserInfo userInfo = new UserInfo(userName, password, 0);
         try {
@@ -162,5 +164,32 @@ public class MainClient {
             return null;
         }
         return respond;
+    }
+
+    public ArrayList<String> currentUserInfo() {
+        UserInfo request = new UserInfo(null, null ,4);
+        UserInfo respond;
+        ArrayList<String> result = new ArrayList<>();
+
+        try {
+            infoToServer.writeObject(request);
+            infoToServer.flush(); // Immediately send it out
+
+            respond = (UserInfo)infoFromServer.readObject();
+            while(respond.getMode() != 5) {
+                result.add(respond.getUserName());
+                respond = (UserInfo)infoFromServer.readObject();
+            }
+
+            return result;
+        }
+        catch(IOException ex) {
+            System.err.println("Client:" + ex);
+            return null;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
+            return null;
+        }
     }
 }

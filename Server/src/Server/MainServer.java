@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class MainServer {
     // Constructor
@@ -176,6 +177,16 @@ public class MainServer {
                                 userInfo.setLiked(false);
                             }
                             infoToClient.writeObject(userInfo);
+                        }
+                        // 4 for real time info userList
+                        else if(userInfo.getMode() == 4) {
+                            ArrayList<String> users = new ArrayList<>();
+                            users = connector.onlineUser();
+
+                            for(int i = 0 ; i < users.size(); i++) {
+                                UserInfo temp = new UserInfo(users.get(i), null, 4);
+                                infoToClient.writeObject(temp);
+                            }
                         }
                     }
                 } // while client not logged out

@@ -14,6 +14,8 @@ import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.geometry.*;
 
+import java.util.ArrayList;
+
 /*
  * This is the main frame of the dictionary's UI
  * Applying JavaFX
@@ -59,6 +61,74 @@ public class DictFrame extends Application {
     // One client, one dict frame
     private MainClient client = new MainClient();
     private String clientUser;
+
+    // User list real-time handler
+    class UserList extends Thread {
+        public void run() {
+            try {
+                while(true) {
+                    sleep(5000);
+                    ArrayList<String>onlineUsers = new ArrayList<>();
+                    onlineUsers = client.currentUserInfo();
+                    // TODO: refresh current user list
+                }
+
+            }
+            catch(InterruptedException ex) {
+
+            }
+        }
+    }
+
+    // Search button single-time thread test
+    class Search extends Thread {
+        public void run() {
+            String word = searchWordTextField.getText();
+                /* TODO: Perhaps we need to check if the input is valid first
+                later...
+                */
+            if (onlyOne()) {
+                UserInfo result;
+                if (searchFlag[0]) result = client.query(word, 0); // Youdao
+                else if (searchFlag[1]) result = client.query(word, 1); // Bing
+                else result = client.query(word, 2); // Jinshan
+
+                switch (result.getQueryType()) {
+                    // 0 for Youdao
+                    case 0:
+                        fromYoudao.setText(result.getResult());
+                        break;
+                    // 1 for Bing
+                    case 1:
+                        fromBing.setText(result.getResult());
+                        break;
+                    // 2 for Jinshan
+                    case 2:
+                        fromJinshan.setText(result.getResult());
+                        break;
+                    default:
+                }
+            }
+
+            // TODO: Results need to be sorted
+            else if (all()) {
+                UserInfo[] result;
+                result = client.queryAll(word);
+                fromYoudao.setText(result[0].getResult());
+                fromBing.setText(result[1].getResult());
+                fromJinshan.setText(result[2].getResult());
+            }
+            // TODO: Results need to be sorted
+            else {
+                for (int i = 0; i < searchFlag.length; i++) {
+                    if (searchFlag[i]) {
+                        UserInfo result;
+                        result = client.query(word, i);
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -313,10 +383,13 @@ public class DictFrame extends Application {
         searchButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                String word = searchWordTextField.getText();
+                Search search_thread = new Search();
+                search_thread.start();
                 /* TODO: Perhaps we need to check if the input is valid first
                 later...
                 */
+                /*
+                String word = searchWordTextField.getText();
                 if(onlyOne()) {
                     UserInfo result;
                     if(searchFlag[0]) result = client.query(word, 0); // Youdao
@@ -356,7 +429,7 @@ public class DictFrame extends Application {
                             result = client.query(word, i);
                         }
                     }
-                }
+                }*/
             }
         });
 

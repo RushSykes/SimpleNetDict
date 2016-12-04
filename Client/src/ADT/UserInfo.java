@@ -7,6 +7,8 @@ public class UserInfo implements Serializable {
     // 1 for signUp
     // 2 for query
     // 3 for thumb up
+    // 4 for read real time info
+    // 5 for read real time info complete
     // To be added more for int mode
     private int mode;
     private String userName;

@@ -1,6 +1,7 @@
 package Server;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /*
  * This is the connector class used for C/S mode
@@ -63,6 +64,7 @@ public class DBConnector {
     // 0 for success
     // 1 for wrong password
     // 2 for username does not exist
+    // 3 for already logged in
     public int findUser_Login(String userName, String password) {
         // Make sure the connection is established
         if(connDone) {
@@ -71,7 +73,11 @@ public class DBConnector {
                 ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE userName =\'" + userName + "\' ");
                 while(rs.next()) {
                     if(rs.getString("password").equals(password)) {
+                        stmt.executeUpdate("UPDATE users SET stat = 1 WHERE userName ='" + userName + "\' ");
                         return 0;
+                    }
+                    else if(rs.getInt("stat") == 1) {
+                        return 3;
                     }
                     else
                         return 1;
@@ -194,5 +200,33 @@ public class DBConnector {
         }
         System.out.println("Connection with database not established");
         return -1;
+    }
+
+    // =========================================
+    // Get real time online user list
+    // Return : all the online users
+    public ArrayList<String> onlineUser() {
+        if(connDone) {
+            try {
+                Statement stmt = DB_Conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE stat = 1");
+                ArrayList<String> users = new ArrayList<>();
+
+                while(rs.next()) {
+                    users.add(rs.getString("userName"));
+                }
+
+                return users;
+            }
+            catch (SQLException ex) {
+                System.out.println("Thumb Up");
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+                return null;
+            }
+        }
+        System.out.println("Connection with database not established");
+        return null;
     }
 }
