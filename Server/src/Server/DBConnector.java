@@ -74,14 +74,18 @@ public class DBConnector {
                 while(rs.next()) {
                     if(rs.getString("password").equals(password)) {
                         stmt.executeUpdate("UPDATE users SET stat = 1 WHERE userName ='" + userName + "\' ");
+                        stmt.close();
                         return 0;
                     }
                     else if(rs.getInt("stat") == 1) {
+                        stmt.close();
                         return 3;
                     }
                     else
+                        stmt.close();
                         return 1;
                 }
+                stmt.close();
                 return 2;
             }
             catch(SQLException ex) {
@@ -112,11 +116,14 @@ public class DBConnector {
                 while (!rs.next()) {
                     if (password.equals(confirm)) {
                         stmt.executeUpdate("INSERT INTO users (userName, password) VALUES (\'" + userName + "\', \'" + password + "\')");
+                        stmt.close();
                         return 0;
                     }
                     else
+                        stmt.close();
                         return 1;
                 }
+                stmt.close();
                 return 2;
             }
             catch (SQLException ex) {
@@ -158,6 +165,7 @@ public class DBConnector {
                 // This user thumb up the word this time (he may have disliked it before)
                 stmt.executeUpdate("INSERT INTO thumbup (word, dictName, user) VALUES (\'" + word + "\', \'" + dictName + "\', \'" + user +"\')");
                 stmt.executeUpdate("UPDATE dicts SET dictScore = dictScore + 1 WHERE dictName = \'" + dictName + "\'");
+                stmt.close();
                 return 0;
             }
             catch (SQLException ex) {
@@ -188,10 +196,11 @@ public class DBConnector {
                 while(rs.next()) {
                     score = rs.getInt("dictScore");
                 }
+                stmt.close();
                 return score;
             }
             catch (SQLException ex) {
-                System.out.println("Thumb Up");
+                System.out.println("Dict Score");
                 System.out.println("SQLException: " + ex.getMessage());
                 System.out.println("SQLState: " + ex.getSQLState());
                 System.out.println("VendorError: " + ex.getErrorCode());
@@ -216,10 +225,11 @@ public class DBConnector {
                     users.add(rs.getString("userName"));
                 }
 
+                stmt.close();
                 return users;
             }
             catch (SQLException ex) {
-                System.out.println("Thumb Up");
+                System.out.println("Onlien Users");
                 System.out.println("SQLException: " + ex.getMessage());
                 System.out.println("SQLState: " + ex.getSQLState());
                 System.out.println("VendorError: " + ex.getErrorCode());
@@ -228,5 +238,37 @@ public class DBConnector {
         }
         System.out.println("Connection with database not established");
         return null;
+    }
+
+    // =========================================
+    // Set stat in database of tbe corresponding user to 0(offline)
+    // 1 for database data modified
+    // -1 for exceptions
+    public int logOut(String userName) {
+        if(connDone) {
+            try {
+                Statement stmt = DB_Conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT * FROM users WHERE userName =\'" + userName + "\'");
+
+                while(rs.next()) {
+                    stmt.executeUpdate("UPDATE users SET stat = 0 WHERE userName ='" + userName + "\' ");
+                    break;
+                }
+
+                stmt.close();
+                DB_Conn.close();
+                connDone = false;
+                return 1;
+            }
+            catch(SQLException ex) {
+                System.out.println("Logout");
+                System.out.println("SQLException: " + ex.getMessage());
+                System.out.println("SQLState: " + ex.getSQLState());
+                System.out.println("VendorError: " + ex.getErrorCode());
+                return -1;
+            }
+        }
+        System.out.println("Connection with database not established");
+        return -1;
     }
 }

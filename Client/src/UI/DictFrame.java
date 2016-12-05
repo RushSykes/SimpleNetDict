@@ -5,6 +5,8 @@ import Client.MainClient;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -13,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 import javafx.geometry.*;
-
+import javafx.stage.WindowEvent;
 import java.util.ArrayList;
 
 /*
@@ -60,6 +62,7 @@ public class DictFrame extends Application {
 
     // One client, one dict frame
     private MainClient client = new MainClient();
+    private UserList userList = new UserList();
     private String clientUser;
 
     // User list real-time handler
@@ -71,11 +74,15 @@ public class DictFrame extends Application {
                     ArrayList<String>onlineUsers = new ArrayList<>();
                     onlineUsers = client.currentUserInfo();
                     // TODO: refresh current user list
+                    ObservableList<String> list = FXCollections.observableArrayList();
+                    for(int i = 0; i < onlineUsers.size(); i++) {
+                        list.add(onlineUsers.get(i));
+                    }
+                    currentUser.setItems(list);
                 }
-
             }
             catch(InterruptedException ex) {
-
+                System.out.println("Client: real time info exception");
             }
         }
     }
@@ -286,6 +293,8 @@ public class DictFrame extends Application {
 
         searchScene = new Scene(searchPane, 1200, 800);
 
+        userList.start();
+
         // =============================================================
         // Listener and handlers
 
@@ -385,51 +394,6 @@ public class DictFrame extends Application {
             public void handle(ActionEvent event) {
                 Search search_thread = new Search();
                 search_thread.start();
-                /* TODO: Perhaps we need to check if the input is valid first
-                later...
-                */
-                /*
-                String word = searchWordTextField.getText();
-                if(onlyOne()) {
-                    UserInfo result;
-                    if(searchFlag[0]) result = client.query(word, 0); // Youdao
-                    else if(searchFlag[1]) result = client.query(word, 1); // Bing
-                    else result = client.query(word, 2); // Jinshan
-
-                    switch (result.getQueryType()) {
-                        // 0 for Youdao
-                        case 0:
-                            fromYoudao.setText(result.getResult());
-                            break;
-                        // 1 for Bing
-                        case 1:
-                            fromBing.setText(result.getResult());
-                            break;
-                        // 2 for Jinshan
-                        case 2:
-                            fromJinshan.setText(result.getResult());
-                            break;
-                        default:
-                    }
-                }
-
-                // TODO: Results need to be sorted
-                else if(all()) {
-                    UserInfo[] result;
-                    result = client.queryAll(word);
-                    fromYoudao.setText(result[0].getResult());
-                    fromBing.setText(result[1].getResult());
-                    fromJinshan.setText(result[2].getResult());
-                }
-                // TODO: Results need to be sorted
-                else {
-                    for(int i = 0; i < searchFlag.length; i++) {
-                        if(searchFlag[i]) {
-                            UserInfo result;
-                            result = client.query(word, i);
-                        }
-                    }
-                }*/
             }
         });
 
@@ -515,6 +479,16 @@ public class DictFrame extends Application {
                     likeJinshan.setSelected(false);
                     likeJinshan.setText("like it");
                 }
+            }
+        });
+
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                // TODO: Inform the server that the program has been closed
+                int flag = client.logOut(clientUser);
+                if (flag == 0)
+                    System.exit(0);
             }
         });
 

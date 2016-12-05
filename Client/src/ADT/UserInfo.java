@@ -9,6 +9,7 @@ public class UserInfo implements Serializable {
     // 3 for thumb up
     // 4 for read real time info
     // 5 for read real time info complete
+    // 6 and 7 for logout(exit the program)
     // To be added more for int mode
     private int mode;
     private String userName;

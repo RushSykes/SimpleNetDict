@@ -192,4 +192,35 @@ public class MainClient {
             return null;
         }
     }
+
+    // Return :
+    // -1 for exception
+    // 0 for success
+    public int logOut(String userName) {
+        UserInfo request = new UserInfo(userName, null, 6);
+        UserInfo respond;
+
+        try {
+            infoToServer.writeObject(request);
+            infoToServer.flush(); // Immediately send it out
+
+            respond = (UserInfo)infoFromServer.readObject();
+            if(respond.getMode() == 7) {
+                infoToServer.close();
+                infoFromServer.close();
+                socket.close();
+                return 0;
+            }
+        }
+        catch(IOException ex) {
+            System.err.println("Client:" + ex);
+            return -1;
+        }
+        catch(ClassNotFoundException ex) {
+            System.err.println("Client: " + ex);
+            return -1;
+        }
+
+        return -1;
+    }
 }

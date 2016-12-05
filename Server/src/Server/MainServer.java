@@ -178,7 +178,7 @@ public class MainServer {
                             }
                             infoToClient.writeObject(userInfo);
                         }
-                        // 4 for real time info userList
+                        // 4 and 5 for real time info userList
                         else if(userInfo.getMode() == 4) {
                             ArrayList<String> users = new ArrayList<>();
                             users = connector.onlineUser();
@@ -186,6 +186,17 @@ public class MainServer {
                             for(int i = 0 ; i < users.size(); i++) {
                                 UserInfo temp = new UserInfo(users.get(i), null, 4);
                                 infoToClient.writeObject(temp);
+                            }
+                            infoToClient.writeObject(new UserInfo(null, null, 5));
+                        }
+                        // 6 for exiting the program, and shutdown the Handle client thread
+                        // 7 to inform the client you're good to go
+                        else if(userInfo.getMode()== 6) {
+                            if(connector.logOut(userInfo.getUserName())==1) {
+                                UserInfo respond = new UserInfo(userInfo.getUserName(), null, 7);
+                                infoToClient.writeObject(respond);
+                                clientNo--;
+                                break; // break out of while (to finally)
                             }
                         }
                     }
@@ -196,6 +207,17 @@ public class MainServer {
             }
             catch(ClassNotFoundException ex) {
                 System.err.println("Server: " + ex);
+            }
+            finally {
+                // Release the resource the thread applied
+                try {
+                    infoToClient.close();
+                    infoFromClient.close();
+                    socket.close();
+                }
+                catch(IOException ex) {
+                    System.err.println("Server: " + ex);
+                }
             }
         }
     } // Inner class ClientHandler
