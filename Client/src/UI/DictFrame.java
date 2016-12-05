@@ -3,6 +3,7 @@ package UI;
 import ADT.UserInfo;
 import Client.MainClient;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -67,18 +68,26 @@ public class DictFrame extends Application {
 
     // User list real-time handler
     class UserList extends Thread {
+        ObservableList<String> list = FXCollections.observableArrayList();
         public void run() {
             try {
                 while(true) {
                     sleep(5000);
-                    ArrayList<String>onlineUsers = new ArrayList<>();
-                    onlineUsers = client.currentUserInfo();
+                    final ArrayList<String>onlineUsers = new ArrayList<>();
+                    onlineUsers.addAll(client.currentUserInfo());
                     // TODO: refresh current user list
-                    ObservableList<String> list = FXCollections.observableArrayList();
-                    for(int i = 0; i < onlineUsers.size(); i++) {
-                        list.add(onlineUsers.get(i));
-                    }
-                    currentUser.setItems(list);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            list.clear();
+                            for(int i = 0; i < onlineUsers.size(); i++) {
+                                list.add(onlineUsers.get(i));
+                            }
+                            if(!list.isEmpty())
+                                currentUser.setItems(list);
+                        }
+                    });
+
                 }
             }
             catch(InterruptedException ex) {

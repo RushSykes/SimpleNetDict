@@ -125,7 +125,7 @@ public class MainServer {
                                     infoToClient.writeObject(new Integer(-1));
                                     System.out.println("Register stat: -1");
                             }
-                            System.out.println("=====^^^^^^^^=====");
+                            System.out.println("=====^^^^^=====");
                         }
                         // 2 for query
                         else if(userInfo.getMode() == 2) {
@@ -196,6 +196,11 @@ public class MainServer {
                                 UserInfo respond = new UserInfo(userInfo.getUserName(), null, 7);
                                 infoToClient.writeObject(respond);
                                 clientNo--;
+                                System.out.println("=====LogOut=====");
+                                System.out.println("Connection canceled by user");
+                                System.out.println("User IP: " + socket.getInetAddress());
+                                System.out.println("Client now: " + clientNo);
+                                System.out.println("=====^^^^^=====");
                                 break; // break out of while (to finally)
                             }
                         }
