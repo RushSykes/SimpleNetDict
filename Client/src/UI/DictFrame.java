@@ -2,22 +2,34 @@ package UI;
 
 import ADT.UserInfo;
 import Client.MainClient;
+import Util.WordPic;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.*;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.geometry.*;
 import javafx.stage.WindowEvent;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 /*
  * This is the main frame of the dictionary's UI
@@ -73,9 +85,8 @@ public class DictFrame extends Application {
             try {
                 while(true) {
                     sleep(5000);
-                    final ArrayList<String>onlineUsers = new ArrayList<>();
+                    ArrayList<String>onlineUsers = new ArrayList<>();
                     onlineUsers.addAll(client.currentUserInfo());
-                    // TODO: refresh current user list
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -491,10 +502,54 @@ public class DictFrame extends Application {
             }
         });
 
+        // Context menu for online user list
+        currentUser.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>();
+            ContextMenu contextMenu = new ContextMenu();
+
+            // Menu entry: send picture
+            MenuItem sendPicItem = new MenuItem();
+            sendPicItem.textProperty().bind(Bindings.format("Send to %s", cell.itemProperty()));
+            sendPicItem.setOnAction(event -> {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Selected userName
+                        String item = cell.getItem();
+                        try {
+                            String picPath = WordPic.createImage(fromYoudao.getText(), new java.awt.Font("黑体", java.awt.Font.BOLD, 36),
+                                    new File(clientUser + "_" + new Date().toString()),
+                                    640, 480);
+                            // TODO: Call some method to send the picture at picPath through Client
+                            // eg: client.sendPicture(picPath);
+                        }
+                        catch(Exception ex) {
+                            System.out.println("Picture gen error");
+                            System.out.println(ex);
+                        }
+                    }
+                });
+            });
+
+            // Add menu entry
+            contextMenu.getItems().add(sendPicItem);
+
+            // Cell properties
+            cell.textProperty().bind(cell.itemProperty());
+            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
+                if (isNowEmpty) {
+                    cell.setContextMenu(null);
+                }
+                else {
+                    cell.setContextMenu(contextMenu);
+                }
+            });
+            return cell;
+        });
+
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                // TODO: Inform the server that the program has been closed
                 int flag = client.logOut(clientUser);
                 if (flag == 0)
                     System.exit(0);

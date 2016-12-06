@@ -5,16 +5,21 @@ import ADT.UserInfo;
 import ADT.Youdao;
 import ADT.Bing;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainServer {
-    // Constructor
+    // clientNo
     int clientNo = 0;
+    // userList
+    Map<String, String> userMap = new HashMap<>();
+
+    // Constructor
     public MainServer() {
         try {
             ServerSocket serverSocket = new ServerSocket(8000);
@@ -43,6 +48,7 @@ public class MainServer {
     class HandleClient extends Thread {
         // This would be the unique socket for the specific client
         private Socket socket;
+        private ServerSocket picListenSocket;
 
         // Streams for interaction with the client
         private ObjectOutputStream infoToClient;
@@ -50,6 +56,104 @@ public class MainServer {
 
         // Connector
         private DBConnector connector;
+
+        // Each client thread has this picture listener
+        // This is for the very client this thread is dealing with
+        // Because every thread only deals with one client
+        // So we just need to accept one socket
+        // Check if it's this thread's guest's ip
+        class picListener extends Thread {
+            public void run() {
+                try {
+                    picListenSocket = new ServerSocket(8001);
+                    Socket accepted = picListenSocket.accept();
+                    picHandler newPicHandler;
+                    if(accepted.getInetAddress().equals(socket.getInetAddress())) {
+                        newPicHandler = new picHandler(accepted);
+                        newPicHandler.start();
+                    }
+                }
+                catch(IOException ex) {
+                    System.err.println("Picture Handler:" + ex);
+                }
+            }
+
+            // Inner inner class
+            class picHandler extends Thread {
+                private Socket picSocket;
+
+                public picHandler(Socket picSocket) {
+                    this.picSocket = picSocket;
+                }
+
+                public void run() {
+                    // Try receiving
+                    try {
+                        // For receiving picture & saving to local disk
+                        byte[] inputBytes;
+                        int length;
+                        DataInputStream dataFromClient = null;
+                        FileOutputStream outToFile = null;
+                        ObjectInputStream forwardFromClient = null;
+
+                        dataFromClient = new DataInputStream(picSocket.getInputStream());
+                        File tempFile = new File(new Date().toString() + ".png");
+
+                        // Write to server local disk
+                        outToFile = new FileOutputStream(tempFile);
+                        inputBytes = new byte[1024];
+
+                        // Read picture from client
+                        while((length = dataFromClient.read(inputBytes, 0, inputBytes.length)) > 0) {
+                            outToFile.write(inputBytes, 0, length);
+                            outToFile.flush(); // Immediately write the current portion to the file
+                        }
+
+                        // Close picture input and file output stream
+                        if (dataFromClient != null)
+                            dataFromClient.close();
+                        if (outToFile != null)
+                            outToFile.close();
+
+                        // For forwarding(sending)
+                        // Get target info
+                        forwardFromClient = new ObjectInputStream(picSocket.getInputStream());
+                        UserInfo targetInfo = (UserInfo)forwardFromClient.readObject();
+                        String targetName = targetInfo.getUserName();
+                        String targetIp = userMap.get(targetName).replaceAll("/", "");
+
+                        if(forwardFromClient != null)
+                            forwardFromClient.close();
+
+                        // Get picture file that just has been received
+                        String tempPath = tempFile.getAbsolutePath();
+                        byte[] sendBytes;
+                        DataOutputStream dataToClient = null;
+                        FileInputStream inFromFile = null;
+
+                        // Create a socket with the target client
+                        Socket forwardSocket = new Socket(targetIp, 8001);
+
+                        dataToClient = new DataOutputStream(forwardSocket.getOutputStream());
+                        inFromFile = new FileInputStream(new File(tempPath));
+
+                        sendBytes = new byte[1024];
+                        while((length = inFromFile.read(sendBytes, 0, sendBytes.length)) > 0) {
+                            dataToClient.write(sendBytes, 0, length);
+                            dataToClient.flush();
+                        }
+                    }
+                    catch(IOException ex) {
+                        System.err.println("Picture handler:");
+                        System.err.println(ex);
+                    }
+                    catch(ClassNotFoundException ex) {
+                        System.err.println("Picture handler:");
+                        System.err.println(ex);
+                    }
+                }
+            } // picHandler
+        } // picListener
 
         public HandleClient(Socket socket) {
             this.socket = socket;
@@ -86,6 +190,7 @@ public class MainServer {
                             switch (connector.findUser_Login(userInfo.getUserName(), userInfo.getPassword())) {
                                 case 0:
                                     infoToClient.writeObject(new Integer(0));
+                                    userMap.put(userInfo.getUserName(), socket.getInetAddress().toString());
                                     System.out.println("LogIn stat: 0");
                                     break;
                                 case 1:
@@ -191,10 +296,11 @@ public class MainServer {
                         }
                         // 6 for exiting the program, and shutdown the Handle client thread
                         // 7 to inform the client you're good to go
-                        else if(userInfo.getMode()== 6) {
+                        else if(userInfo.getMode() == 6) {
                             if(connector.logOut(userInfo.getUserName())==1) {
                                 UserInfo respond = new UserInfo(userInfo.getUserName(), null, 7);
                                 infoToClient.writeObject(respond);
+                                userMap.remove(userInfo.getUserName());
                                 clientNo--;
                                 System.out.println("=====LogOut=====");
                                 System.out.println("Connection canceled by user");

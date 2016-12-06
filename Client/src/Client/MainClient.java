@@ -1,11 +1,12 @@
 package Client;
 
 import ADT.UserInfo;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
+import java.io.*;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainClient {
     // Streams for interaction with the server
@@ -13,7 +14,80 @@ public class MainClient {
     private ObjectInputStream infoFromServer;
 
     // Socket
-    private Socket socket;
+    private Socket socket; // userinfo-only socket
+    private ServerSocket picListenSocket;
+
+    // Inner Class for listening and creating picture socket
+    class picListener extends Thread {
+        public void run() {
+            // Create a severSocket for picture receiving
+            try {
+                picListenSocket = new ServerSocket(8001);
+
+                while(true) {
+                    Socket accepted = picListenSocket.accept();
+                    System.out.println("Picture incoming");
+                    picHandler newPicHandler = new picHandler(accepted);
+
+                    // Start picHandler when listener says "oh there is a picture coming"
+                    newPicHandler.start();
+                }
+            }
+            catch(IOException ex) {
+                System.err.println("Picture Handler:" + ex);
+            }
+        }
+
+        class picHandler extends Thread {
+            // This client acts as a server when receiving picture and can have multiple picture sockets
+            private Socket picSocket;
+
+            // Constructor
+            public picHandler(Socket picSocket) {
+                this.picSocket = picSocket;
+            }
+
+            // Run
+            public void run() {
+                // For receiving picture & saving to local disk
+                byte[] inputBytes;
+                int length;
+                DataInputStream dataFromServer = null;
+                FileOutputStream outToFile = null;
+
+                // Try receiving
+                try {
+                    dataFromServer = new DataInputStream(picSocket.getInputStream());
+                    outToFile = new FileOutputStream(new File(new Date().toString() + ".png"));
+                    inputBytes = new byte[1024];
+
+                    // Read picture from server
+                    while((length = dataFromServer.read(inputBytes, 0, inputBytes.length)) > 0) {
+                        outToFile.write(inputBytes, 0, length);
+                        outToFile.flush(); // Immediately write the current portion to the file
+                    }
+                }
+                catch(IOException ex) {
+                    System.err.println("Receiving picture:");
+                    System.err.println(ex);
+                }
+                finally {
+                    try {
+                        if (dataFromServer != null)
+                            dataFromServer.close();
+                        if (outToFile != null)
+                            outToFile.close();
+                        if(socket != null)
+                            socket.close();
+                    }
+                    catch(IOException ex) {
+                        System.err.println("Closing pic stream:");
+                        System.err.println(ex);
+                    }
+                } // finally
+            } // run
+        } // pic handler inner-inner class
+    } // pic listener inner class
 
     // Constructor
     // Prepare socket
@@ -26,6 +100,8 @@ public class MainClient {
             infoToServer= new ObjectOutputStream(socket.getOutputStream());
             infoToServer.flush();
             infoFromServer = new ObjectInputStream(socket.getInputStream());
+
+            new picListener().start();
         }
         catch (IOException ex) {
             System.err.println("Client: " + ex);
@@ -209,6 +285,7 @@ public class MainClient {
                 infoToServer.close();
                 infoFromServer.close();
                 socket.close();
+                picListenSocket.close();
                 return 0;
             }
         }
@@ -222,5 +299,39 @@ public class MainClient {
         }
 
         return -1;
+    }
+
+    public void sendPic(String userName, String picPath) {
+        // TODO: Send picture with target username to server
+        try {
+            // For sending picture, single time socket
+            Socket picSocket = new Socket("172.26.91.76", 8001);
+            byte[] sendBytes;
+            int length;
+            DataOutputStream dataToServer = null;
+            FileInputStream inFromFile = null;
+
+            dataToServer = new DataOutputStream(picSocket.getOutputStream());
+            inFromFile = new FileInputStream(new File(picPath));
+
+            sendBytes = new byte[1024];
+            while((length = inFromFile.read(sendBytes, 0, sendBytes.length)) > 0) {
+                dataToServer.write(sendBytes, 0, length);
+                dataToServer.flush();
+            }
+
+            if(dataToServer != null)
+                dataToServer.close();
+            if(inFromFile != null)
+                inFromFile.close();
+            if(picSocket != null)
+                picSocket.close();
+
+            // TODO: Tell the server which user to send the picture to
+
+        }
+        catch(IOException ex) {
+            System.err.println("Sending picture:\n" + ex);
+        }
     }
 }
