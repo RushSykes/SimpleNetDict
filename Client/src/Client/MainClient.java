@@ -328,7 +328,14 @@ public class MainClient {
                 picSocket.close();
 
             // TODO: Tell the server which user to send the picture to
+            ObjectOutputStream thisObjectToServer = new ObjectOutputStream(picSocket.getOutputStream());
+            UserInfo target = new UserInfo(userName, null, 8);
 
+            thisObjectToServer.writeObject(target);
+            thisObjectToServer.flush(); // Immediately send it out
+
+            if(thisObjectToServer != null)
+                thisObjectToServer.close();
         }
         catch(IOException ex) {
             System.err.println("Sending picture:\n" + ex);

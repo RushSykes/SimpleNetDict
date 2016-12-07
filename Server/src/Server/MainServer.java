@@ -142,6 +142,11 @@ public class MainServer {
                             dataToClient.write(sendBytes, 0, length);
                             dataToClient.flush();
                         }
+
+                        if(dataToClient != null)
+                            dataToClient.close();
+                        if(inFromFile != null)
+                            inFromFile.close();
                     }
                     catch(IOException ex) {
                         System.err.println("Picture handler:");
