@@ -97,7 +97,7 @@ public class MainServer {
                         ObjectInputStream forwardFromClient = null;
 
                         dataFromClient = new DataInputStream(picSocket.getInputStream());
-                        File tempFile = new File(new Date().toString() + ".png");
+                        File tempFile = new File(new Date().getTime() + ".png");
 
                         // Write to server local disk
                         outToFile = new FileOutputStream(tempFile);
