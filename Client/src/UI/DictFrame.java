@@ -515,13 +515,13 @@ public class DictFrame extends Application {
                     @Override
                     public void run() {
                         // Selected userName
-                        String item = cell.getItem();
+                        String userName = cell.getItem();
                         try {
                             String picPath = WordPic.createImage(fromYoudao.getText(), new java.awt.Font("TimesRoman", java.awt.Font.BOLD, 24),
                                     new File(clientUser + "_" + new Date().getTime() + ".png"),
                                     640, 480);
                             // TODO: Call some method to send the picture at picPath through Client
-                            // eg: client.sendPicture(picPath);
+                            client.sendPic(userName, picPath);
                         }
                         catch(Exception ex) {
                             System.out.println("Picture gen error");
