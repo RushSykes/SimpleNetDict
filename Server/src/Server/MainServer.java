@@ -134,7 +134,7 @@ public class MainServer {
                         FileInputStream inFromFile = null;
 
                         // Create a socket with the target client
-                        Socket forwardSocket = new Socket(targetIp, 8001);
+                        Socket forwardSocket = new Socket(targetIp, 8002);
 
                         dataToClient = new DataOutputStream(forwardSocket.getOutputStream());
                         inFromFile = new FileInputStream(new File(tempPath));
@@ -149,6 +149,8 @@ public class MainServer {
                             dataToClient.close();
                         if(inFromFile != null)
                             inFromFile.close();
+                        if(forwardSocket != null)
+                            forwardSocket.close();
                     }
                     catch(IOException ex) {
                         System.err.println("Picture handler:");

@@ -22,7 +22,7 @@ public class MainClient {
         public void run() {
             // Create a severSocket for picture receiving
             try {
-                picListenSocket = new ServerSocket(8001);
+                picListenSocket = new ServerSocket(8002);
 
                 while(true) {
                     Socket accepted = picListenSocket.accept();
