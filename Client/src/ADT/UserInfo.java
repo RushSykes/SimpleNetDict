@@ -10,6 +10,7 @@ public class UserInfo implements Serializable {
     // 4 for read real time info
     // 5 for read real time info complete
     // 6 and 7 for logout(exit the program)
+    // 8 and 9 for sending/receiving picture data
     // To be added more for int mode
     private int mode;
     private String userName;
@@ -22,6 +23,8 @@ public class UserInfo implements Serializable {
     private String word;
     private String result;
     private int dictScore;
+
+    private byte[] picData;
 
     // For signup and login
     public UserInfo(String userName, String password, int mode) {
@@ -99,5 +102,13 @@ public class UserInfo implements Serializable {
 
     public void setDictScore(int score) {
         this.dictScore = score;
+    }
+
+    public byte[] getPicData() {
+        return picData;
+    }
+
+    public void setPicData(byte[] picData) {
+        this.picData = picData;
     }
 }

@@ -92,34 +92,39 @@ public class MainServer {
                         // For receiving picture & saving to local disk
                         byte[] inputBytes;
                         int length;
-                        DataInputStream dataFromClient = null;
                         FileOutputStream outToFile = null;
                         ObjectInputStream forwardFromClient = null;
 
-                        dataFromClient = new DataInputStream(picSocket.getInputStream());
+                        forwardFromClient = new ObjectInputStream(picSocket.getInputStream());
                         File tempFile = new File(new Date().getTime() + ".png");
 
                         // Write to server local disk
                         outToFile = new FileOutputStream(tempFile);
-                        inputBytes = new byte[1024];
+
+                        UserInfo temp;
+                        temp = (UserInfo)forwardFromClient.readObject();
+                        inputBytes = temp.getPicData();
+                        length = inputBytes.length;
 
                         // Read picture from client
-                        while((length = dataFromClient.read(inputBytes, 0, inputBytes.length)) > 0) {
+                        while( length > 0 ) {
                             outToFile.write(inputBytes, 0, length);
                             outToFile.flush(); // Immediately write the current portion to the file
+
+                            temp = (UserInfo)forwardFromClient.readObject();
+                            inputBytes = temp.getPicData();
+                            length = inputBytes.length;
+                            // Last pack received would be the one that contains nothing but target username (length = 0)
                         }
 
                         // Close picture input and file output stream
-                        if (dataFromClient != null)
-                            dataFromClient.close();
                         if (outToFile != null)
                             outToFile.close();
 
+                        // ==================================================================
                         // For forwarding(sending)
                         // Get target info
-                        forwardFromClient = new ObjectInputStream(picSocket.getInputStream());
-                        UserInfo targetInfo = (UserInfo)forwardFromClient.readObject();
-                        String targetName = targetInfo.getUserName();
+                        String targetName = temp.getUserName();
                         String targetIp = userMap.get(targetName).replaceAll("/", "");
 
                         if(forwardFromClient != null)
@@ -130,20 +135,33 @@ public class MainServer {
                         // Get picture file that just has been received
                         String tempPath = tempFile.getAbsolutePath();
                         byte[] sendBytes;
-                        DataOutputStream dataToClient = null;
+                        ObjectOutputStream dataToClient = null;
                         FileInputStream inFromFile = null;
 
                         // Create a socket with the target client
                         Socket forwardSocket = new Socket(targetIp, 8002);
 
-                        dataToClient = new DataOutputStream(forwardSocket.getOutputStream());
+                        dataToClient = new ObjectOutputStream(forwardSocket.getOutputStream());
                         inFromFile = new FileInputStream(new File(tempPath));
 
                         sendBytes = new byte[1024];
-                        while((length = inFromFile.read(sendBytes, 0, sendBytes.length)) > 0) {
-                            dataToClient.write(sendBytes, 0, length);
+                        inFromFile.read(sendBytes, 0, 1024);
+                        length = sendBytes.length;
+
+                        while( length > 0) {
+                            UserInfo sendPack = new UserInfo(null, null, 8);
+                            sendPack.setPicData(sendBytes);
+                            dataToClient.writeObject(sendPack);
                             dataToClient.flush();
+
+                            sendBytes = new byte[1024];
+                            inFromFile.read(sendBytes, 0, 1024);
+                            length = sendBytes.length;
                         }
+
+                        temp = new UserInfo(targetName, null, 9);
+                        dataToClient.writeObject(temp);
+                        dataToClient.flush();
 
                         if(dataToClient != null)
                             dataToClient.close();
@@ -182,6 +200,7 @@ public class MainServer {
 
                 connector = new DBConnector();
                 connector.connect();
+                new picListener().start();
 
                 while(true) {
                     // Read

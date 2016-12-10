@@ -518,7 +518,7 @@ public class DictFrame extends Application {
                         String userName = cell.getItem();
                         try {
                             String picPath = WordPic.createImage(fromYoudao.getText(), new java.awt.Font("TimesRoman", java.awt.Font.BOLD, 24),
-                                    new File(clientUser + "_" + new Date().getTime() + ".png"),
+                                    new File(new Date().getTime() + ".png"),
                                     640, 480);
                             // TODO: Call some method to send the picture at picPath through Client
                             client.sendPic(userName, picPath);

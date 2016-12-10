@@ -52,22 +52,33 @@ public class MainClient {
                 // For receiving picture & saving to local disk
                 byte[] inputBytes;
                 int length;
-                DataInputStream dataFromServer = null;
+                ObjectInputStream dataFromServer = null;
                 FileOutputStream outToFile = null;
 
                 // Try receiving
                 try {
-                    dataFromServer = new DataInputStream(picSocket.getInputStream());
+                    dataFromServer = new ObjectInputStream(picSocket.getInputStream());
                     outToFile = new FileOutputStream(new File(new Date().getTime() + ".png"));
-                    inputBytes = new byte[1024];
 
+                    UserInfo temp;
+                    temp = (UserInfo)dataFromServer.readObject();
+                    inputBytes = temp.getPicData();
+                    length = inputBytes.length;
                     // Read picture from server
-                    while((length = dataFromServer.read(inputBytes, 0, inputBytes.length)) > 0) {
+                    while( length > 0) {
                         outToFile.write(inputBytes, 0, length);
                         outToFile.flush(); // Immediately write the current portion to the file
+
+                        temp = (UserInfo)dataFromServer.readObject();
+                        inputBytes = temp.getPicData();
+                        length = inputBytes.length;
                     }
                 }
                 catch(IOException ex) {
+                    System.err.println("Receiving picture:");
+                    System.err.println(ex);
+                }
+                catch(ClassNotFoundException ex) {
                     System.err.println("Receiving picture:");
                     System.err.println(ex);
                 }
@@ -77,8 +88,8 @@ public class MainClient {
                             dataFromServer.close();
                         if (outToFile != null)
                             outToFile.close();
-                        if(socket != null)
-                            socket.close();
+                        if(picSocket != null)
+                            picSocket.close();
                     }
                     catch(IOException ex) {
                         System.err.println("Closing pic stream:");
@@ -308,32 +319,38 @@ public class MainClient {
             Socket picSocket = new Socket("172.26.91.76", 8001);
             byte[] sendBytes;
             int length;
-            DataOutputStream dataToServer = null;
+            ObjectOutputStream dataToServer = null;
             FileInputStream inFromFile = null;
 
-            dataToServer = new DataOutputStream(picSocket.getOutputStream());
+            dataToServer = new ObjectOutputStream(picSocket.getOutputStream());
             inFromFile = new FileInputStream(new File(picPath));
 
             sendBytes = new byte[1024];
-            while((length = inFromFile.read(sendBytes, 0, sendBytes.length)) > 0) {
-                dataToServer.write(sendBytes, 0, length);
+            inFromFile.read(sendBytes, 0, 1024);
+            length = sendBytes.length;
+
+            while(length > 0) {
+                UserInfo temp = new UserInfo(null, null, 8);
+                temp.setPicData(sendBytes);
+                dataToServer.writeObject(temp);
                 dataToServer.flush();
+
+                sendBytes = new byte[1024];
+                inFromFile.read(sendBytes, 0, 1024);
+                length = sendBytes.length;
             }
 
-            if(dataToServer != null)
-                dataToServer.close();
             if(inFromFile != null)
                 inFromFile.close();
 
             // TODO: Tell the server which user to send the picture to
-            ObjectOutputStream thisObjectToServer = new ObjectOutputStream(picSocket.getOutputStream());
-            UserInfo target = new UserInfo(userName, null, 8);
+            UserInfo target = new UserInfo(userName, null, 9);
 
-            thisObjectToServer.writeObject(target);
-            thisObjectToServer.flush(); // Immediately send it out
+            dataToServer.writeObject(target);
+            dataToServer.flush(); // Immediately send it out
 
-            if(thisObjectToServer != null)
-                thisObjectToServer.close();
+            if(dataToServer != null)
+                dataToServer.close();
 
             if(picSocket != null)
                 picSocket.close();
