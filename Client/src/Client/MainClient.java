@@ -322,6 +322,7 @@ public class MainClient {
             FileInputStream inFromFile = null;
 
             dataToServer = new ObjectOutputStream(picSocket.getOutputStream());
+            dataToServer.flush();
             inFromFile = new FileInputStream(new File(picPath));
 
             sendBytes = new byte[1024];

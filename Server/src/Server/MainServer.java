@@ -150,6 +150,7 @@ public class MainServer {
                         Socket forwardSocket = new Socket(targetIp, 8002);
 
                         dataToClient = new ObjectOutputStream(forwardSocket.getOutputStream());
+                        dataToClient.flush();
                         inFromFile = new FileInputStream(new File(tempPath));
 
                         sendBytes = new byte[1024];
