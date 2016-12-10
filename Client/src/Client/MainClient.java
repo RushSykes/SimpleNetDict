@@ -58,7 +58,7 @@ public class MainClient {
                 // Try receiving
                 try {
                     dataFromServer = new DataInputStream(picSocket.getInputStream());
-                    outToFile = new FileOutputStream(new File(new Date().toString() + ".png"));
+                    outToFile = new FileOutputStream(new File(new Date().getTime() + ".png"));
                     inputBytes = new byte[1024];
 
                     // Read picture from server
