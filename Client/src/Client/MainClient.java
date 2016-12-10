@@ -70,7 +70,10 @@ public class MainClient {
 
                         temp = (UserInfo)dataFromServer.readObject();
                         inputBytes = temp.getPicData();
-                        length = inputBytes.length;
+                        if(inputBytes != null)
+                            length = inputBytes.length;
+                        else
+                            break;
                     }
                 }
                 catch(IOException ex) {

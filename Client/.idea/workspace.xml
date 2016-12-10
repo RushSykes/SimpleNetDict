@@ -40,13 +40,13 @@
       <file leaf-file-name="MainClient.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/Client/MainClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="111">
-              <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
+            <state relative-caret-position="127">
+              <caret line="61" column="34" selection-start-line="61" selection-start-column="34" selection-end-line="61" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1474#1475#0" expanded="true" />
                 <element signature="e#1532#1533#0" expanded="true" />
-                <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+                <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -98,8 +98,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="496" />
-    <option name="y" value="57" />
+    <option name="x" value="466" />
+    <option name="y" value="44" />
     <option name="width" value="1390" />
     <option name="height" value="942" />
   </component>
@@ -735,15 +735,15 @@
       <workItem from="1481287000221" duration="73000" />
       <workItem from="1481287217021" duration="49000" />
       <workItem from="1481300834081" duration="113000" />
-      <workItem from="1481352569119" duration="10094000" />
+      <workItem from="1481352569119" duration="11352000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74648000" />
+    <option name="totallyTimeSpent" value="75906000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="496" y="57" width="1390" height="942" extended-state="0" />
+    <frame x="466" y="44" width="1390" height="942" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -801,7 +801,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/Client/MainClient.java</url>
-          <line>317</line>
+          <line>320</line>
           <properties />
           <option name="timeStamp" value="34" />
         </line-breakpoint>
@@ -850,7 +850,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -886,7 +886,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -922,7 +922,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -958,7 +958,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -994,7 +994,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1031,7 +1031,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1067,7 +1067,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1103,7 +1103,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1139,7 +1139,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1175,7 +1175,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1211,7 +1211,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1247,7 +1247,7 @@
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -1346,13 +1346,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Client/MainClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="111">
-          <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
+        <state relative-caret-position="127">
+          <caret line="61" column="34" selection-start-line="61" selection-start-column="34" selection-end-line="61" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#1474#1475#0" expanded="true" />
             <element signature="e#1532#1533#0" expanded="true" />
-            <marker date="1481362515146" expanded="true" signature="6021:6028" ph="{...}" />
+            <marker date="1481363793703" expanded="true" signature="6136:6143" ph="{...}" />
           </folding>
         </state>
       </provider>
