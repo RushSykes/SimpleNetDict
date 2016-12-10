@@ -324,8 +324,6 @@ public class MainClient {
                 dataToServer.close();
             if(inFromFile != null)
                 inFromFile.close();
-            if(picSocket != null)
-                picSocket.close();
 
             // TODO: Tell the server which user to send the picture to
             ObjectOutputStream thisObjectToServer = new ObjectOutputStream(picSocket.getOutputStream());
@@ -336,6 +334,9 @@ public class MainClient {
 
             if(thisObjectToServer != null)
                 thisObjectToServer.close();
+
+            if(picSocket != null)
+                picSocket.close();
         }
         catch(IOException ex) {
             System.err.println("Sending picture:\n" + ex);

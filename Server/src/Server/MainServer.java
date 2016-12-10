@@ -124,6 +124,8 @@ public class MainServer {
 
                         if(forwardFromClient != null)
                             forwardFromClient.close();
+                        if(picSocket != null)
+                            picSocket.close();
 
                         // Get picture file that just has been received
                         String tempPath = tempFile.getAbsolutePath();
