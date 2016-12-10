@@ -317,7 +317,7 @@ public class MainClient {
         try {
             // For sending picture, single time socket
             Socket picSocket = new Socket("172.26.91.76", 8001);
-            byte[] sendBytes;
+            byte[] sendBytes = null;
             int length;
             ObjectOutputStream dataToServer = null;
             FileInputStream inFromFile = null;
@@ -326,8 +326,7 @@ public class MainClient {
             inFromFile = new FileInputStream(new File(picPath));
 
             sendBytes = new byte[1024];
-            inFromFile.read(sendBytes, 0, 1024);
-            length = sendBytes.length;
+            length = inFromFile.read(sendBytes, 0, 1024);
 
             while(length > 0) {
                 UserInfo temp = new UserInfo(null, null, 8);
@@ -335,9 +334,7 @@ public class MainClient {
                 dataToServer.writeObject(temp);
                 dataToServer.flush();
 
-                sendBytes = new byte[1024];
-                inFromFile.read(sendBytes, 0, 1024);
-                length = sendBytes.length;
+                length = inFromFile.read(sendBytes, 0, 1024);
             }
 
             if(inFromFile != null)

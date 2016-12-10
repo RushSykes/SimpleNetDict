@@ -145,8 +145,7 @@ public class MainServer {
                         inFromFile = new FileInputStream(new File(tempPath));
 
                         sendBytes = new byte[1024];
-                        inFromFile.read(sendBytes, 0, 1024);
-                        length = sendBytes.length;
+                        length = inFromFile.read(sendBytes, 0, 1024);
 
                         while( length > 0) {
                             UserInfo sendPack = new UserInfo(null, null, 8);
@@ -154,9 +153,7 @@ public class MainServer {
                             dataToClient.writeObject(sendPack);
                             dataToClient.flush();
 
-                            sendBytes = new byte[1024];
-                            inFromFile.read(sendBytes, 0, 1024);
-                            length = sendBytes.length;
+                            length = inFromFile.read(sendBytes, 0, 1024);
                         }
 
                         temp = new UserInfo(targetName, null, 9);
