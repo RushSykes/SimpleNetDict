@@ -19,10 +19,14 @@ public class MainServer {
     // userList
     Map<String, String> userMap = new HashMap<>();
 
+    private ServerSocket serverSocket;
+    private ServerSocket picListenSocket;
+
     // Constructor
     public MainServer() {
         try {
-            ServerSocket serverSocket = new ServerSocket(8000);
+            serverSocket = new ServerSocket(8000);
+            picListenSocket = new ServerSocket(8001);
             // identify each client with a number
             System.out.println("Server started");
             while(true) {
@@ -48,7 +52,6 @@ public class MainServer {
     class HandleClient extends Thread {
         // This would be the unique socket for the specific client
         private Socket socket;
-        private ServerSocket picListenSocket;
 
         // Streams for interaction with the client
         private ObjectOutputStream infoToClient;
@@ -60,17 +63,19 @@ public class MainServer {
         // Each client thread has this picture listener
         // This is for the very client this thread is dealing with
         // Because every thread only deals with one client
-        // So we just need to accept one socket
+        // So in fact only one socket would be accepted
         // Check if it's this thread's guest's ip
         class picListener extends Thread {
             public void run() {
                 try {
-                    picListenSocket = new ServerSocket(8001);
-                    Socket accepted = picListenSocket.accept();
-                    picHandler newPicHandler;
-                    if(accepted.getInetAddress().equals(socket.getInetAddress())) {
-                        newPicHandler = new picHandler(accepted);
-                        newPicHandler.start();
+                    while(true) {
+                        Socket accepted = picListenSocket.accept();
+                        picHandler newPicHandler;
+                        if (accepted.getInetAddress().equals(socket.getInetAddress())) {
+                            newPicHandler = new picHandler(accepted);
+                            newPicHandler.start();
+                            break;
+                        }
                     }
                 }
                 catch(IOException ex) {
@@ -113,7 +118,10 @@ public class MainServer {
 
                             temp = (UserInfo)forwardFromClient.readObject();
                             inputBytes = temp.getPicData();
-                            length = inputBytes.length;
+                            if(inputBytes != null)
+                                length = inputBytes.length;
+                            else
+                                break;
                             // Last pack received would be the one that contains nothing but target username (length = 0)
                         }
 
