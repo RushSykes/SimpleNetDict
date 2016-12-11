@@ -95,7 +95,7 @@ public class MainServer {
                     // Try receiving
                     try {
                         // For receiving picture & saving to local disk
-                        byte[] inputBytes;
+                        byte[] inputBytes = new byte[1024];
                         int length;
                         FileOutputStream outToFile = null;
                         ObjectInputStream forwardFromClient = null;
@@ -161,6 +161,7 @@ public class MainServer {
                             sendPack.setPicData(sendBytes);
                             dataToClient.writeObject(sendPack);
                             dataToClient.flush();
+                            dataToClient.reset();
 
                             length = inFromFile.read(sendBytes, 0, 1024);
                         }

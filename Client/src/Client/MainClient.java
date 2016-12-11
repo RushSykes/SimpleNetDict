@@ -329,15 +329,17 @@ public class MainClient {
             inFromFile = new FileInputStream(new File(picPath));
 
             sendBytes = new byte[1024];
-            length = inFromFile.read(sendBytes, 0, 1024);
+            length = inFromFile.read(sendBytes, 0, sendBytes.length);
 
             while(length > 0) {
+
                 UserInfo temp = new UserInfo(null, null, 8);
                 temp.setPicData(sendBytes);
                 dataToServer.writeObject(temp);
                 dataToServer.flush();
+                dataToServer.reset();
 
-                length = inFromFile.read(sendBytes, 0, 1024);
+                length = inFromFile.read(sendBytes, 0, sendBytes.length);
             }
 
             if(inFromFile != null)

@@ -151,6 +151,18 @@ public class DictFrame extends Application {
                     if (searchFlag[i]) {
                         UserInfo result;
                         result = client.query(word, i);
+                        switch(i) {
+                            case 0:
+                                fromYoudao.setText(result.getResult());
+                                break;
+                            case 1:
+                                fromBing.setText(result.getResult());
+                                break;
+                            case 2:
+                                fromJinshan.setText(result.getResult());
+                                break;
+                            default:
+                        }
                     }
                 }
             }
