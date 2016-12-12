@@ -356,6 +356,10 @@ public class DictFrame extends Application {
                         userNotExist.setFill(Color.FIREBRICK);
                         userNotExist.setText("User doesn't exist");
                         break;
+                    case 3:
+                        userNotExist.setFill(Color.FIREBRICK);
+                        userNotExist.setText("User already logged in");
+                        break;
                     default:
                         userNotExist.setFill(Color.FIREBRICK);
                         userNotExist.setText("An error occurred");
