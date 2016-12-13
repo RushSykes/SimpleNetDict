@@ -67,9 +67,10 @@ public class DictFrame extends Application {
     private Label searchWord;
     private TextField searchWordTextField;
     private Button searchButton;
-    private TextArea fromYoudao, fromBing, fromJinshan;
+    private TextArea TAFirst, TASecond, TAThird;
     private ToggleButton likeYoudao, likeBing, likeJinshan;
     private CheckBox checkYoudao, checkBing, checkJinshan;
+    private HBox youdaoHBox, bingHBox, jinshanHBox;
     private boolean[] searchFlag;
     private ListView<String> currentUser;
 
@@ -123,48 +124,81 @@ public class DictFrame extends Application {
                 switch (result.getQueryType()) {
                     // 0 for Youdao
                     case 0:
-                        fromYoudao.setText(result.getResult());
+                        TAFirst.setText("有道\n");
+                        TAFirst.appendText(result.getResult());
+                        // TAFirst.setText(result.getResult());
                         break;
                     // 1 for Bing
                     case 1:
-                        fromBing.setText(result.getResult());
+                        TAFirst.setText("必应\n");
+                        TAFirst.appendText(result.getResult());
+                        // TASecond.setText(result.getResult());
                         break;
                     // 2 for Jinshan
                     case 2:
-                        fromJinshan.setText(result.getResult());
+                        TAFirst.setText("金山\n");
+                        TAFirst.appendText(result.getResult());
+                        // TAThird.setText(result.getResult());
                         break;
                     default:
                 }
+                TASecond.clear();
+                TAThird.clear();
             }
 
             // TODO: Results need to be sorted
             else if (all()) {
                 UserInfo[] result;
                 result = client.queryAll(word);
-                fromYoudao.setText(result[0].getResult());
-                fromBing.setText(result[1].getResult());
-                fromJinshan.setText(result[2].getResult());
+                String[] dictName = {"有道\n", "必应\n", "金山\n"};
+                for (int i = 0; i < searchFlag.length; ++i)
+                    for (int j = 0; j < searchFlag.length - i - 1; ++j)
+                        if (result[j].getDictScore() < result[j + 1].getDictScore()) {
+                            UserInfo tmpInfo = result[j];
+                            result[j] = result[j + 1];
+                            result[j + 1] = tmpInfo;
+                            String tmpName = dictName[j];
+                            dictName[j] = dictName[j + 1];
+                            dictName[j + 1] = tmpName;
+                        }
+                TAFirst.setText(dictName[0] + result[0].getResult());
+                TASecond.setText(dictName[1] + result[1].getResult());
+                TAThird.setText(dictName[2] + result[2].getResult());
             }
             // TODO: Results need to be sorted
             else {
+                ArrayList<UserInfo> result = new ArrayList<>();
+                ArrayList<String> dictName = new ArrayList<>();
                 for (int i = 0; i < searchFlag.length; i++) {
                     if (searchFlag[i]) {
-                        UserInfo result;
-                        result = client.query(word, i);
-                        switch(i) {
+                        UserInfo tmpResult;
+                        tmpResult = client.query(word, i);
+                        result.add(tmpResult);
+                        switch (i) {
                             case 0:
-                                fromYoudao.setText(result.getResult());
+                                dictName.add("有道\n");
                                 break;
                             case 1:
-                                fromBing.setText(result.getResult());
+                                dictName.add("必应\n");
                                 break;
                             case 2:
-                                fromJinshan.setText(result.getResult());
+                                dictName.add("金山\n");
                                 break;
                             default:
                         }
                     }
                 }
+                if (result.get(0).getDictScore() < result.get(1).getDictScore()) {
+                    UserInfo tmpInfo = result.get(0);
+                    result.set(0, result.get(1));
+                    result.set(1, tmpInfo);
+                    String tmpName = dictName.get(0);
+                    dictName.set(0, dictName.get(1));
+                    dictName.set(1, tmpName);
+                }
+                TAFirst.setText(dictName.get(0) + result.get(0).getResult());
+                TASecond.setText(dictName.get(1) + result.get(1).getResult());
+                TAThird.clear();
             }
         }
     }
@@ -284,23 +318,23 @@ public class DictFrame extends Application {
         searchPane.add(searchWord, 0, 0);
 
         searchWordTextField = new TextField();
-        GridPane.setColumnSpan(searchWordTextField, 2);
+        GridPane.setColumnSpan(searchWordTextField, 4);
         searchPane.add(searchWordTextField, 1, 0);
 
         searchButton = new Button("Search");
-        searchPane.add(searchButton, 3, 0);
+        searchPane.add(searchButton, 5, 0);
 
         currentUser = new ListView<>();
-        GridPane.setRowSpan(currentUser, 3);
-        searchPane.add(currentUser, 0, 1);
+        GridPane.setRowSpan(currentUser, 5);
+        searchPane.add(currentUser, 6, 0);
 
         // Checkboxes
         checkYoudao = new CheckBox("Youdao");
-        searchPane.add(checkYoudao, 1, 1);
+        //searchPane.add(checkYoudao, 1, 1);
         checkBing = new CheckBox("Bing");
-        searchPane.add(checkBing, 1, 2);
+        //searchPane.add(checkBing, 1, 2);
         checkJinshan = new CheckBox("Jinshan");
-        searchPane.add(checkJinshan, 1, 3);
+        //searchPane.add(checkJinshan, 1, 3);
 
         searchFlag = new boolean[3];
         searchFlag[0] = false;
@@ -308,22 +342,43 @@ public class DictFrame extends Application {
         searchFlag[2] = false;
 
         // Text areas
-        fromYoudao = new TextArea();
-        searchPane.add(fromYoudao, 2, 1);
-        fromBing = new TextArea();
-        searchPane.add(fromBing, 2, 2);
-        fromJinshan = new TextArea();
-        searchPane.add(fromJinshan, 2, 3);
+        TAFirst = new TextArea();
+        GridPane.setColumnSpan(TAFirst, 6);
+        searchPane.add(TAFirst, 0, 2);
+        TASecond = new TextArea();
+        GridPane.setColumnSpan(TASecond, 6);
+        searchPane.add(TASecond, 0, 3);
+        TAThird = new TextArea();
+        GridPane.setColumnSpan(TAThird, 6);
+        searchPane.add(TAThird, 0, 4);
 
         // Like buttons
-        likeYoudao = new ToggleButton("like it");
-        searchPane.add(likeYoudao, 3, 1);
-        likeBing = new ToggleButton("like it");
-        searchPane.add(likeBing, 3, 2);
-        likeJinshan = new ToggleButton("like it");
-        searchPane.add(likeJinshan, 3, 3);
+        likeYoudao = new ToggleButton("like Youdao");
+        //searchPane.add(likeYoudao, 3, 1);
+        likeBing = new ToggleButton("like Bing");
+        //searchPane.add(likeBing, 3, 2);
+        likeJinshan = new ToggleButton("like Jinshan");
+        //searchPane.add(likeJinshan, 3, 3);
 
-        searchScene = new Scene(searchPane, 1200, 800);
+        youdaoHBox = new HBox(10);
+        youdaoHBox.setAlignment(Pos.CENTER);
+        youdaoHBox.getChildren().addAll(checkYoudao, likeYoudao);
+        GridPane.setColumnSpan(youdaoHBox, 2);
+        searchPane.add(youdaoHBox, 0, 1);
+
+        bingHBox = new HBox(10);
+        bingHBox.setAlignment(Pos.CENTER);
+        bingHBox.getChildren().addAll(checkBing, likeBing);
+        GridPane.setColumnSpan(bingHBox, 2);
+        searchPane.add(bingHBox, 2, 1);
+
+        jinshanHBox = new HBox(10);
+        jinshanHBox.setAlignment(Pos.CENTER);
+        jinshanHBox.getChildren().addAll(checkJinshan, likeJinshan);
+        GridPane.setColumnSpan(jinshanHBox, 2);
+        searchPane.add(jinshanHBox, 4, 1);
+
+        searchScene = new Scene(searchPane, 1000, 800);
 
         userList.start();
 
@@ -456,7 +511,7 @@ public class DictFrame extends Application {
                 // A dislike this time
                 else {
                     likeYoudao.setSelected(false);
-                    likeYoudao.setText("like it");
+                    likeYoudao.setText("like Youdao");
                 }
             }
         });
@@ -485,7 +540,7 @@ public class DictFrame extends Application {
                 // A dislike this time
                 else {
                     likeBing.setSelected(false);
-                    likeBing.setText("like it");
+                    likeBing.setText("like Bing");
                 }
             }
         });
@@ -513,7 +568,7 @@ public class DictFrame extends Application {
                 // A dislike this time
                 else {
                     likeJinshan.setSelected(false);
-                    likeJinshan.setText("like it");
+                    likeJinshan.setText("like Jinshan");
                 }
             }
         });
@@ -533,7 +588,7 @@ public class DictFrame extends Application {
                         // Selected userName
                         String userName = cell.getItem();
                         try {
-                            String picPath = WordPic.createImage(fromYoudao.getText(), new java.awt.Font("TimesRoman", java.awt.Font.BOLD, 24),
+                            String picPath = WordPic.createImage(TAFirst.getText(), new java.awt.Font("TimesRoman", java.awt.Font.BOLD, 24),
                                     new File(new Date().getTime() + ".png"),
                                     640, 480);
                             // TODO: Call some method to send the picture at picPath through Client
