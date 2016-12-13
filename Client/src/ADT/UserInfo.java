@@ -40,7 +40,7 @@ public class UserInfo implements Serializable {
         this.queryType = type;
     }
 
-    // For thumb up
+    // For thumb up or query
     public UserInfo(String word, String user, int mode, int type) {
         this.word = word;
         this.userName = user;
@@ -94,6 +94,14 @@ public class UserInfo implements Serializable {
 
     public void setLiked(boolean liked) {
         this.liked = liked;
+    }
+
+    public int getLikeType() {
+        return likeType;
+    }
+
+    public void setLikeType(int option) {
+        likeType = option;
     }
 
     public int getDictScore() {

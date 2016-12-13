@@ -96,6 +96,14 @@ public class UserInfo implements Serializable {
         this.liked = liked;
     }
 
+    public int getLikeType() {
+        return likeType;
+    }
+
+    public void setLikeType(int option) {
+        likeType = option;
+    }
+
     public int getDictScore() {
         return dictScore;
     }

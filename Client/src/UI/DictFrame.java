@@ -115,93 +115,193 @@ public class DictFrame extends Application {
                 /* TODO: Perhaps we need to check if the input is valid first
                 later...
                 */
-            if (onlyOne()) {
-                UserInfo result;
-                if (searchFlag[0]) result = client.query(word, 0); // Youdao
-                else if (searchFlag[1]) result = client.query(word, 1); // Bing
-                else result = client.query(word, 2); // Jinshan
+            Platform.runLater(new Runnable() {
+                public void run() {
+                    if (onlyOne()) {
+                        UserInfo result;
+                        if (searchFlag[0]) result = client.query(word, clientUser, 0); // Youdao
+                        else if (searchFlag[1]) result = client.query(word, clientUser, 1); // Bing
+                        else result = client.query(word, clientUser,  2); // Jinshan
 
-                switch (result.getQueryType()) {
-                    // 0 for Youdao
-                    case 0:
-                        TAFirst.setText("有道\n");
-                        TAFirst.appendText(result.getResult());
-                        // TAFirst.setText(result.getResult());
-                        break;
-                    // 1 for Bing
-                    case 1:
-                        TAFirst.setText("必应\n");
-                        TAFirst.appendText(result.getResult());
-                        // TASecond.setText(result.getResult());
-                        break;
-                    // 2 for Jinshan
-                    case 2:
-                        TAFirst.setText("金山\n");
-                        TAFirst.appendText(result.getResult());
-                        // TAThird.setText(result.getResult());
-                        break;
-                    default:
-                }
-                TASecond.clear();
-                TAThird.clear();
-            }
-
-            // TODO: Results need to be sorted
-            else if (all()) {
-                UserInfo[] result;
-                result = client.queryAll(word);
-                String[] dictName = {"有道\n", "必应\n", "金山\n"};
-                for (int i = 0; i < searchFlag.length; ++i)
-                    for (int j = 0; j < searchFlag.length - i - 1; ++j)
-                        if (result[j].getDictScore() < result[j + 1].getDictScore()) {
-                            UserInfo tmpInfo = result[j];
-                            result[j] = result[j + 1];
-                            result[j + 1] = tmpInfo;
-                            String tmpName = dictName[j];
-                            dictName[j] = dictName[j + 1];
-                            dictName[j + 1] = tmpName;
-                        }
-                TAFirst.setText(dictName[0] + result[0].getResult());
-                TASecond.setText(dictName[1] + result[1].getResult());
-                TAThird.setText(dictName[2] + result[2].getResult());
-            }
-            // TODO: Results need to be sorted
-            else {
-                ArrayList<UserInfo> result = new ArrayList<>();
-                ArrayList<String> dictName = new ArrayList<>();
-                for (int i = 0; i < searchFlag.length; i++) {
-                    if (searchFlag[i]) {
-                        UserInfo tmpResult;
-                        tmpResult = client.query(word, i);
-                        result.add(tmpResult);
-                        switch (i) {
+                        switch (result.getQueryType()) {
+                            // 0 for Youdao
                             case 0:
-                                dictName.add("有道\n");
+                                TAFirst.setText("有道\n");
+                                TAFirst.appendText(result.getResult());
+
+                                likeJinshan.setSelected(false);
+                                likeJinshan.setText("like Jinshan");
+                                likeBing.setSelected(false);
+                                likeBing.setText("like Bing");
+
+                                if(result.getLikeType() == 0) {
+                                    likeYoudao.setSelected(false);
+                                    likeYoudao.setText("like Youdao");
+                                }
+                                else if(result.getLikeType() == 1) {
+                                    likeYoudao.setSelected(true);
+                                    likeYoudao.setText("liked");
+                                }
                                 break;
+                            // 1 for Bing
                             case 1:
-                                dictName.add("必应\n");
+                                TAFirst.setText("必应\n");
+                                TAFirst.appendText(result.getResult());
+
+                                likeJinshan.setSelected(false);
+                                likeJinshan.setText("like Jinshan");
+                                likeYoudao.setSelected(false);
+                                likeYoudao.setText("like Youdao");
+
+                                if(result.getLikeType() == 0) {
+                                    likeBing.setSelected(false);
+                                    likeBing.setText("like Bing");
+                                }
+                                else if(result.getLikeType() == 1) {
+                                    likeBing.setSelected(true);
+                                    likeBing.setText("liked");
+                                }
                                 break;
+                            // 2 for Jinshan
                             case 2:
-                                dictName.add("金山\n");
+                                TAFirst.setText("金山\n");
+                                TAFirst.appendText(result.getResult());
+
+                                likeYoudao.setSelected(false);
+                                likeYoudao.setText("like Youdao");
+                                likeBing.setSelected(false);
+                                likeBing.setText("like Bing");
+
+                                if(result.getLikeType() == 0) {
+                                    likeJinshan.setSelected(false);
+                                    likeJinshan.setText("like Jinshan");
+                                }
+                                else if(result.getLikeType() == 1) {
+                                    likeJinshan.setSelected(true);
+                                    likeJinshan.setText("liked");
+                                }
                                 break;
                             default:
                         }
+                        TASecond.clear();
+                        TAThird.clear();
                     }
-                }
-                if (result.get(0).getDictScore() < result.get(1).getDictScore()) {
-                    UserInfo tmpInfo = result.get(0);
-                    result.set(0, result.get(1));
-                    result.set(1, tmpInfo);
-                    String tmpName = dictName.get(0);
-                    dictName.set(0, dictName.get(1));
-                    dictName.set(1, tmpName);
-                }
-                TAFirst.setText(dictName.get(0) + result.get(0).getResult());
-                TASecond.setText(dictName.get(1) + result.get(1).getResult());
-                TAThird.clear();
-            }
-        }
-    }
+
+                    // TODO: Results need to be sorted
+                    else if (all()) {
+                        UserInfo[] result;
+                        result = client.queryAll(word, clientUser);
+                        String[] dictName = {"有道\n", "必应\n", "金山\n"};
+                        for (int i = 0; i < searchFlag.length; ++i)
+                            for (int j = 0; j < searchFlag.length - i - 1; ++j)
+                                if (result[j].getDictScore() < result[j + 1].getDictScore()) {
+                                    UserInfo tmpInfo = result[j];
+                                    result[j] = result[j + 1];
+                                    result[j + 1] = tmpInfo;
+                                    String tmpName = dictName[j];
+                                    dictName[j] = dictName[j + 1];
+                                    dictName[j + 1] = tmpName;
+                                }
+                        TAFirst.setText(dictName[0] + result[0].getResult());
+                        TASecond.setText(dictName[1] + result[1].getResult());
+                        TAThird.setText(dictName[2] + result[2].getResult());
+
+                        for(int i = 0; i < 3; i++) {
+                            if(result[i].getQueryType() == 0) {
+                                if (result[i].getLikeType() == 0) {
+                                    likeYoudao.setSelected(false);
+                                    likeYoudao.setText("like Youdao");
+                                }
+                                else if (result[i].getLikeType() == 1) {
+                                    likeYoudao.setSelected(true);
+                                    likeYoudao.setText("liked");
+                                }
+                            }
+                            else if(result[i].getQueryType() == 1) {
+                                if (result[i].getLikeType() == 0) {
+                                    likeBing.setSelected(false);
+                                    likeBing.setText("like Bing");
+                                }
+                                else if (result[i].getLikeType() == 1) {
+                                    likeBing.setSelected(true);
+                                    likeBing.setText("liked");
+                                }
+                            }
+                            else if(result[i].getQueryType() == 2) {
+                                if (result[i].getLikeType() == 0) {
+                                    likeJinshan.setSelected(false);
+                                    likeJinshan.setText("like Jinshan");
+                                } else if (result[i].getLikeType() == 1) {
+                                    likeJinshan.setSelected(true);
+                                    likeJinshan.setText("liked");
+                                }
+                            }
+                        } // for 3 toggle buttons
+                    } // all query
+
+                    // TODO: Results need to be sorted
+                    else {
+                        ArrayList<UserInfo> result = new ArrayList<>();
+                        ArrayList<String> dictName = new ArrayList<>();
+                        for (int i = 0; i < searchFlag.length; i++) {
+                            if (searchFlag[i]) {
+                                UserInfo tmpResult;
+                                tmpResult = client.query(word, clientUser, i);
+                                result.add(tmpResult);
+                                switch (i) {
+                                    case 0:
+                                        dictName.add("有道\n");
+                                        if(tmpResult.getLikeType() == 0) {
+                                            likeYoudao.setSelected(false);
+                                            likeYoudao.setText("like Youdao");
+                                        }
+                                        else if(tmpResult.getLikeType() == 1) {
+                                            likeYoudao.setSelected(true);
+                                            likeYoudao.setText("liked");
+                                        }
+                                        break;
+                                    case 1:
+                                        dictName.add("必应\n");
+                                        if(tmpResult.getLikeType() == 0) {
+                                            likeBing.setSelected(false);
+                                            likeBing.setText("like Bing");
+                                        }
+                                        else if(tmpResult.getLikeType() == 1) {
+                                            likeBing.setSelected(true);
+                                            likeBing.setText("liked");
+                                        }
+                                        break;
+                                    case 2:
+                                        dictName.add("金山\n");
+                                        if(tmpResult.getLikeType() == 0) {
+                                            likeJinshan.setSelected(false);
+                                            likeJinshan.setText("like Jinshan");
+                                        }
+                                        else if(tmpResult.getLikeType() == 1) {
+                                            likeJinshan.setSelected(true);
+                                            likeJinshan.setText("liked");
+                                        }
+                                        break;
+                                    default:
+                                }
+                            }
+                        }
+                        if (result.get(0).getDictScore() < result.get(1).getDictScore()) {
+                            UserInfo tmpInfo = result.get(0);
+                            result.set(0, result.get(1));
+                            result.set(1, tmpInfo);
+                            String tmpName = dictName.get(0);
+                            dictName.set(0, dictName.get(1));
+                            dictName.set(1, tmpName);
+                        }
+                        TAFirst.setText(dictName.get(0) + result.get(0).getResult());
+                        TASecond.setText(dictName.get(1) + result.get(1).getResult());
+                        TAThird.clear();
+                    }
+                } // Platform thread run
+            }); // Platform thread def
+        } // Search thread run
+    } // Search thread
 
     @Override
     public void start(Stage primaryStage) {

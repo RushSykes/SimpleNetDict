@@ -21,12 +21,14 @@ public class MainServer {
 
     private ServerSocket serverSocket;
     private ServerSocket picListenSocket;
+    private ServerSocket currentUserSocket;
 
     // Constructor
     public MainServer() {
         try {
             serverSocket = new ServerSocket(8000);
             picListenSocket = new ServerSocket(8001);
+            currentUserSocket = new ServerSocket(8003);
             // identify each client with a number
             System.out.println("Server started");
             while(true) {
@@ -59,6 +61,65 @@ public class MainServer {
 
         // Connector
         private DBConnector connector;
+
+        // Each client thread has this online userinfo listener
+        // This is for the very client this thread is dealing with
+        // Because every thread only deals with one client
+        // So in fact only one socket would be accepted
+        // Check if it's this thread's guest's ip
+        class currentUserListener extends Thread {
+            public void run() {
+                try {
+                    while(true) {
+                        Socket accepted = currentUserSocket.accept();
+                        currentUserHandler newUserHandler;
+                        if(accepted.getInetAddress().equals(socket.getInetAddress())) {
+                            newUserHandler = new currentUserHandler(accepted);
+                            newUserHandler.start();
+                            break;
+                        }
+                    }
+                }
+                catch(IOException ex) {
+                    System.err.println("Online userInfo listener:" + ex);
+                }
+            }
+
+            class currentUserHandler extends Thread {
+                private Socket onlineUserSocket;
+
+                public currentUserHandler(Socket socket) {
+                    this.onlineUserSocket = socket;
+                }
+                public void run() {
+                    try {
+                        ObjectInputStream reqFromClient = new ObjectInputStream(onlineUserSocket.getInputStream());
+                        ObjectOutputStream sendToClient = new ObjectOutputStream(onlineUserSocket.getOutputStream());
+
+                        while(true) {
+                            UserInfo userInfo = (UserInfo)reqFromClient.readObject();
+
+                            if (userInfo.getMode() == 4) {
+                                ArrayList<String> users;
+                                users = connector.onlineUser();
+
+                                for (int i = 0; i < users.size(); i++) {
+                                    UserInfo temp = new UserInfo(users.get(i), null, 4);
+                                    sendToClient.writeObject(temp);
+                                }
+                                sendToClient.writeObject(new UserInfo(null, null, 5));
+                            }
+                        }
+                    }
+                    catch(IOException ex) {
+                        System.err.println("Online userInfo handler:" + ex);
+                    }
+                    catch(ClassNotFoundException ex) {
+                        System.err.println("Online userInfo handler:" + ex);
+                    }
+                }
+            }
+        }
 
         // Each client thread has this picture listener
         // This is for the very client this thread is dealing with
@@ -208,6 +269,7 @@ public class MainServer {
                 connector = new DBConnector();
                 connector.connect();
                 new picListener().start();
+                new currentUserListener().start();
 
                 while(true) {
                     // Read
@@ -279,6 +341,8 @@ public class MainServer {
                                     userInfo.setResult(search0.getExplains());
                                     // Add dictScore to the data pack
                                     userInfo.setDictScore(connector.dictScore(0));
+                                    // If he's thumbed up this word before in this dictionary
+                                    userInfo.setLikeType(connector.wordLiked(userInfo.getWord(), userInfo.getUserName(), 0));
                                     // Send it back
                                     infoToClient.writeObject(userInfo);
                                     break;
@@ -288,6 +352,7 @@ public class MainServer {
                                     search1.query(userInfo.getWord());
                                     userInfo.setResult(search1.getExplains());
                                     userInfo.setDictScore(connector.dictScore(1));
+                                    userInfo.setLikeType(connector.wordLiked(userInfo.getWord(), userInfo.getUserName(), 1));
                                     infoToClient.writeObject(userInfo);
                                     break;
                                 //2 for Jinshan
@@ -296,6 +361,7 @@ public class MainServer {
                                     search2.query(userInfo.getWord());
                                     userInfo.setResult(search2.getExplains());
                                     userInfo.setDictScore(connector.dictScore(2));
+                                    userInfo.setLikeType(connector.wordLiked(userInfo.getWord(), userInfo.getUserName(), 2));
                                     infoToClient.writeObject(userInfo);
                                     break;
                                 default:
@@ -307,7 +373,7 @@ public class MainServer {
                             String word = userInfo.getWord();
                             String user = userInfo.getUserName();
                             int dictType = userInfo.getQueryType();
-                            stat = connector.wordLiked(word, user, dictType);
+                            stat = connector.wordThumbUp(word, user, dictType);
                             // 0 he liked it this time
                             if(stat == 0) {
                                 userInfo.setLiked(true);
@@ -318,6 +384,7 @@ public class MainServer {
                             }
                             infoToClient.writeObject(userInfo);
                         }
+                        /*
                         // 4 and 5 for real time info userList
                         else if(userInfo.getMode() == 4) {
                             ArrayList<String> users = new ArrayList<>();
@@ -329,6 +396,7 @@ public class MainServer {
                             }
                             infoToClient.writeObject(new UserInfo(null, null, 5));
                         }
+                        */
                         // 6 for exiting the program, and shutdown the Handle client thread
                         // 7 to inform the client you're good to go
                         else if(userInfo.getMode() == 6) {

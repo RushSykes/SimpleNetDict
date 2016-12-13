@@ -13,9 +13,14 @@ public class MainClient {
     private ObjectOutputStream infoToServer;
     private ObjectInputStream infoFromServer;
 
+    // Streams for retrieving current info about aonline users
+    private ObjectOutputStream infoReqToServer;
+    private ObjectInputStream infoRecFromServer;
+
     // Socket
-    private Socket socket; // userinfo-only socket
+    private Socket socket; // interaction-only socket
     private ServerSocket picListenSocket;
+    private Socket infoSocket; // online user info socket
 
     // Inner Class for listening and creating picture socket
     class picListener extends Thread {
@@ -108,11 +113,16 @@ public class MainClient {
         try {
             // Establish connection to server
             socket = new Socket("172.26.91.76", 8000);
+            infoSocket = new Socket("172.26.91.76", 8003);
 
-            // Create streams
+            // Create interaction streams
             infoToServer= new ObjectOutputStream(socket.getOutputStream());
             infoToServer.flush();
             infoFromServer = new ObjectInputStream(socket.getInputStream());
+
+            // Create info streams
+            infoReqToServer = new ObjectOutputStream(infoSocket.getOutputStream());
+            infoRecFromServer = new ObjectInputStream(infoSocket.getInputStream());
 
             new picListener().start();
         }
@@ -177,8 +187,8 @@ public class MainClient {
         return flag;
     }
 
-    public UserInfo query(String word, int type) {
-        UserInfo request = new UserInfo(word, 2, type);
+    public UserInfo query(String word, String user, int type) {
+        UserInfo request = new UserInfo(word, user, 2, type);
         UserInfo respond;
 
         try {
@@ -198,12 +208,12 @@ public class MainClient {
         return respond;
     }
 
-    public UserInfo[] queryAll(String word) {
+    public UserInfo[] queryAll(String word, String user) {
         UserInfo[] request = new UserInfo[3];
         UserInfo[] respond = new UserInfo[3];
 
         for(int i = 0 ; i < request.length; i++) {
-            request[i] = new UserInfo(word, 2, i);
+            request[i] = new UserInfo(word, user, 2, i);
         }
 
         try {
@@ -261,13 +271,13 @@ public class MainClient {
         ArrayList<String> result = new ArrayList<>();
 
         try {
-            infoToServer.writeObject(request);
-            infoToServer.flush(); // Immediately send it out
+            infoReqToServer.writeObject(request);
+            infoReqToServer.flush(); // Immediately send it out
 
-            respond = (UserInfo)infoFromServer.readObject();
+            respond = (UserInfo)infoRecFromServer.readObject();
             while(respond.getMode() != 5) {
                 result.add(respond.getUserName());
-                respond = (UserInfo)infoFromServer.readObject();
+                respond = (UserInfo)infoRecFromServer.readObject();
             }
 
             return result;
