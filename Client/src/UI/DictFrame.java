@@ -112,11 +112,21 @@ public class DictFrame extends Application {
     class Search extends Thread {
         public void run() {
             String word = searchWordTextField.getText();
-                /* TODO: Perhaps we need to check if the input is valid first
-                later...
-                */
+
             Platform.runLater(new Runnable() {
                 public void run() {
+                    String check = word.toLowerCase();
+
+                    for(int i = 0; i < check.length(); i++) {
+                        char tmp = check.charAt(i);
+                        // If any of the character does not meet the requirements
+                        if( !(tmp >='a' && tmp <= 'z') ) {
+                            // We need to check if the input is valid first
+                            // TODO: Set a label with red warning messages
+                            return;
+                        }
+                    }
+
                     if (onlyOne()) {
                         UserInfo result;
                         if (searchFlag[0]) result = client.query(word, clientUser, 0); // Youdao
@@ -187,7 +197,7 @@ public class DictFrame extends Application {
                         TAThird.clear();
                     }
 
-                    // TODO: Results need to be sorted
+                    // Results need to be sorted
                     else if (all()) {
                         UserInfo[] result;
                         result = client.queryAll(word, clientUser);
@@ -239,7 +249,7 @@ public class DictFrame extends Application {
                         } // for 3 toggle buttons
                     } // all query
 
-                    // TODO: Results need to be sorted
+                    // Results need to be sorted
                     else {
                         ArrayList<UserInfo> result = new ArrayList<>();
                         ArrayList<String> dictName = new ArrayList<>();
@@ -691,7 +701,7 @@ public class DictFrame extends Application {
                             String picPath = WordPic.createImage(TAFirst.getText(), new java.awt.Font("TimesRoman", java.awt.Font.BOLD, 24),
                                     new File(new Date().getTime() + ".png"),
                                     640, 480);
-                            // TODO: Call some method to send the picture at picPath through Client
+                            // Call some method to send the picture at picPath through Client
                             client.sendPic(userName, picPath);
                         }
                         catch(Exception ex) {

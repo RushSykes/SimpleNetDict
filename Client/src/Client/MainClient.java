@@ -325,7 +325,7 @@ public class MainClient {
     }
 
     public void sendPic(String userName, String picPath) {
-        // TODO: Send picture with target username to server
+        // Send picture with target username to server
         try {
             // For sending picture, single time socket
             Socket picSocket = new Socket("172.26.91.76", 8001);
@@ -355,7 +355,7 @@ public class MainClient {
             if(inFromFile != null)
                 inFromFile.close();
 
-            // TODO: Tell the server which user to send the picture to
+            // Tell the server which user to send the picture to
             UserInfo target = new UserInfo(userName, null, 9);
 
             dataToServer.writeObject(target);

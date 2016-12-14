@@ -36,7 +36,7 @@ public class WordPic {
 
         String[] temp = str.split("\n");
 
-        // TODO: Draw string on the canvass
+        // Draw string on the canvass
         for(int i = 0; i < temp.length; i++) {
             g.drawString(temp[i], 0, 24 * (i + 1));
         }
