@@ -115,9 +115,10 @@ public class DictFrame extends Application {
 
             Platform.runLater(new Runnable() {
                 public void run() {
+                    String pattern = "[a-z\\.\\s-]+";
                     String check = word.toLowerCase();
 
-                    for(int i = 0; i < check.length(); i++) {
+                    /* for(int i = 0; i < check.length(); i++) {
                         char tmp = check.charAt(i);
                         // If any of the character does not meet the requirements
                         if( !(tmp >='a' && tmp <= 'z') ) {
@@ -125,13 +126,18 @@ public class DictFrame extends Application {
                             // TODO: Set a label with red warning messages
                             return;
                         }
+                    } */
+
+                    if (!check.matches(pattern)) {
+                        TAFirst.setText("Invalid input!");
+                        return;
                     }
 
                     if (onlyOne()) {
                         UserInfo result;
                         if (searchFlag[0]) result = client.query(word, clientUser, 0); // Youdao
                         else if (searchFlag[1]) result = client.query(word, clientUser, 1); // Bing
-                        else result = client.query(word, clientUser,  2); // Jinshan
+                        else result = client.query(word, clientUser,  2); // Jinshan'
 
                         switch (result.getQueryType()) {
                             // 0 for Youdao
